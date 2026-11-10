@@ -1,6 +1,6 @@
 # Scripts de `gh-aw`
 
-Tres scripts separados:
+Cuatro scripts separados:
 
 - [`repo_search_agentic.py`](repo_search_agentic.py): descubre repositorios que
   usan **GitHub Agentic Workflows** (`gh-aw`) y genera `repos.json`.
@@ -9,11 +9,15 @@ Tres scripts separados:
   reportes Markdown con las últimas ejecuciones de GitHub Actions.
 - [`repo_fetch_issues.py`](repo_fetch_issues.py): exporta todos los issues de
   los repositorios de `repos.json` a un CSV, con el estado y el link directo a
-  cada issue.
+  cada issue. Con `--with-details` agrega también descripción y etiquetas.
+- [`repo_filter_issues.py`](repo_filter_issues.py): filtra los CSV de issues
+  anteriores para quedarse con los que están relacionados con `gh-aw`, usando
+  título, descripción, etiquetas y referencias al pipeline de CI/CD.
 
-`repo_scan_actions.py` y `repo_fetch_issues.py` reutilizan el cliente de GitHub
-y la carga de tokens de `repo_search_agentic.py`, por lo que los tres archivos
-deben estar en el mismo directorio.
+`repo_scan_actions.py`, `repo_fetch_issues.py` y `repo_filter_issues.py`
+reutilizan el cliente de GitHub y la carga de tokens de
+`repo_search_agentic.py`, por lo que los cuatro archivos deben estar en el mismo
+directorio.
 
 ## Requisitos
 
@@ -27,7 +31,9 @@ deben estar en el mismo directorio.
 - Un token de GitHub para la búsqueda de código. `repo_search_agentic.py` lo
   necesita para la Code Search API; `repo_scan_actions.py` y
   `repo_fetch_issues.py` lo usan para consultar repositorios, Actions e issues
-  con un límite mayor. Los scripts lo leen, en este orden:
+  con un límite mayor. `repo_filter_issues.py` solo lo necesita con
+  `--fetch-details`, para completar descripciones y etiquetas que falten en los
+  CSV antiguos. Los scripts lo leen, en este orden:
   1. `--token`
   2. `--env-file` (o la variable `GH_AW_ENV_FILE`), si se indica
   3. el archivo `.env` del directorio actual o de la raíz del repositorio
@@ -196,6 +202,10 @@ python scripts/repo_fetch_issues.py \
   --repos-file repos.json --org PowerShell \
   --exclude PowerShell/vscode-powershell
 
+# Incluir descripción y etiquetas en el CSV (para el filtro)
+python scripts/repo_fetch_issues.py \
+  --repo PowerShell/vscode-powershell --with-details
+
 # Forzar un único CSV aunque haya selección
 python scripts/repo_fetch_issues.py \
   --repos-file repos.json --limit 10 \
@@ -235,9 +245,57 @@ tiene estas columnas:
 | `salida` | Estado actual del issue: `open` o `closed` |
 | `link_issue` | URL pública directa al issue (`html_url`), no la URL de la API |
 
+Con `--with-details` se agregan `descripcion` (cuerpo del issue) y `etiquetas`
+(labels separadas por `;`) después de `titulo`. Esas columnas permiten que
+`repo_filter_issues.py` busque en el cuerpo y en los labels sin volver a
+consultar la API. Un CSV generado sin `--with-details` solo se puede filtrar por
+título, salvo que se use `repo_filter_issues.py --fetch-details`.
+
 Si un repositorio no tiene issues o los tiene deshabilitados, se informa durante
 el progreso y el resto continúa. `--max-pages N` permite limitar las páginas de
 100 issues por repositorio; `0` (por defecto) significa sin límite.
+
+### 5. Filtrar issues relacionados con `gh-aw`
+
+```bash
+# Leer todos los CSV de issues/ y escribir filtered_issues/agentic_issues.csv
+python scripts/repo_filter_issues.py
+
+# Incluir también términos generales de CI/CD
+python scripts/repo_filter_issues.py --include-pipeline
+
+# Agregar palabras clave o etiquetas propias
+python scripts/repo_filter_issues.py \
+  --keyword "safe-outputs" --keyword "agentic" \
+  --label "github-actions"
+
+# Completar descripción y etiquetas consultando la API
+python scripts/repo_filter_issues.py --fetch-details
+
+# Leer un CSV concreto y escribir en otra ruta
+python scripts/repo_filter_issues.py \
+  --input issues/0gis0_issues.csv \
+  --out issues/0gis0_agentic.csv
+```
+
+La salida por defecto es `filtered_issues/agentic_issues.csv`, en su propia
+carpeta, para no mezclarla con los CSV originales de `issues/`. Se puede cambiar
+con `--out`.
+
+Si los CSV se generaron con `repo_fetch_issues.py --with-details`, el filtro
+puede leer `descripcion` y `etiquetas` directamente y no necesita
+`--fetch-details`.
+
+El filtro busca, sin distinguir mayúsculas/minúsculas, en `titulo`,
+`descripcion` y `etiquetas`. Por defecto reconoce señales como `gh-aw`,
+`gh aw`, `agentic workflow`, `[aw]`, `.lock.yml` y `safe outputs`, además de
+labels como `gh-aw`, `agentic` o `agentic-workflows`. Con `--include-pipeline`
+suma `.github/workflows`, `github actions`, `workflow_dispatch`, `workflow run`,
+`ci/cd` y `pipeline`.
+
+El CSV de salida conserva las columnas de entrada y agrega `coincidencias`, que
+indica qué palabra clave o etiqueta hizo coincidir cada issue. Si dos archivos
+de entrada contienen el mismo `link_issue`, se conserva una sola fila.
 
 ## Qué contiene el reporte
 

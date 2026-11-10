@@ -9,6 +9,9 @@ descarta los pull requests y escribe una fila por issue con:
 
 `titulo` contiene el título del issue, `salida` su estado actual (`open` o
 `closed`) y `link_issue` es la URL pública directa al issue, no la URL de la API.
+Con `--with-details` se agregan `descripcion` (cuerpo del issue) y `etiquetas`
+(labels separadas por `;`) después de `titulo`; el filtro de issues puede usar
+esas columnas sin volver a consultar la API.
 
 Cuando se seleccionan repositorios (`--repo`, `--limit`, `--sample`, `--org`,
 etc.), se genera un CSV por repositorio dentro de `issues/`, con el nombre
@@ -28,6 +31,10 @@ Ejemplos:
     # 10 al azar, de forma reproducible -> un CSV por repo en issues/
     python scripts/repo_fetch_issues.py --repos-file repos.json \\
         --sample 10 --seed 42
+
+    # Incluir también descripción y etiquetas (columnas adicionales)
+    python scripts/repo_fetch_issues.py --repo PowerShell/vscode-powershell \\
+        --with-details
 
     # Forzar un único CSV aunque haya selección
     python scripts/repo_fetch_issues.py --repos-file repos.json --limit 10 \\
@@ -59,6 +66,15 @@ CSV_FIELDS = (
     "nombre_repositorio",
     "dueño_repositorio",
     "titulo",
+    "salida",
+    "link_issue",
+)
+DETAILED_CSV_FIELDS = (
+    "nombre_repositorio",
+    "dueño_repositorio",
+    "titulo",
+    "descripcion",
+    "etiquetas",
     "salida",
     "link_issue",
 )
@@ -249,12 +265,26 @@ def should_split_output(args: argparse.Namespace) -> bool:
     )
 
 
+def csv_fields(with_details: bool) -> tuple[str, ...]:
+    return DETAILED_CSV_FIELDS if with_details else CSV_FIELDS
+
+
+def issue_labels(issue: dict[str, Any]) -> str:
+    names: list[str] = []
+    for label in issue.get("labels") or []:
+        name = label.get("name") if isinstance(label, dict) else str(label)
+        if name:
+            names.append(str(name))
+    return ";".join(names)
+
+
 def write_repo_issues(
     api: GitHubAPI,
     repo: str,
     writer: Any,
     max_pages: int,
     verbose: bool,
+    with_details: bool = False,
 ) -> int:
     owner, separator, name = repo.partition("/")
     if not separator or not owner or not name:
@@ -268,15 +298,11 @@ def write_repo_issues(
             if number is not None
             else ""
         )
-        writer.writerow(
-            [
-                name,
-                owner,
-                issue.get("title") or "",
-                issue.get("state") or "",
-                link,
-            ]
-        )
+        row: list[str] = [name, owner, issue.get("title") or ""]
+        if with_details:
+            row.extend([issue.get("body") or "", issue_labels(issue)])
+        row.extend([issue.get("state") or "", link])
+        writer.writerow(row)
         count += 1
     return count
 
@@ -400,13 +426,14 @@ def command_fetch_issues(args: argparse.Namespace) -> int:
             try:
                 with temp_path.open("w", encoding="utf-8", newline="") as handle:
                     writer = csv.writer(handle)
-                    writer.writerow(CSV_FIELDS)
+                    writer.writerow(csv_fields(args.with_details))
                     repo_issues = write_repo_issues(
                         api,
                         repo,
                         writer,
                         max_pages=args.max_pages,
                         verbose=verbose,
+                        with_details=args.with_details,
                     )
                 temp_path.replace(output_path)
             except AuthenticationError:
@@ -430,7 +457,7 @@ def command_fetch_issues(args: argparse.Namespace) -> int:
         combined_output.parent.mkdir(parents=True, exist_ok=True)
         with combined_output.open("w", encoding="utf-8", newline="") as handle:
             writer = csv.writer(handle)
-            writer.writerow(CSV_FIELDS)
+            writer.writerow(csv_fields(args.with_details))
 
             for position, repo in enumerate(selected, 1):
                 if verbose:
@@ -442,6 +469,7 @@ def command_fetch_issues(args: argparse.Namespace) -> int:
                         writer,
                         max_pages=args.max_pages,
                         verbose=verbose,
+                        with_details=args.with_details,
                     )
                 except AuthenticationError:
                     raise
@@ -550,6 +578,14 @@ def build_parser() -> argparse.ArgumentParser:
         help=(
             "Archivo CSV combinado (por defecto: issues.csv). No se usa en "
             "modo separado, que escribe en issues/"
+        ),
+    )
+    parser.add_argument(
+        "--with-details",
+        action="store_true",
+        help=(
+            "Agregar descripcion y etiquetas al CSV (útil para "
+            "repo_filter_issues.py)"
         ),
     )
     parser.add_argument(
