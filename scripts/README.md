@@ -255,6 +255,11 @@ Si un repositorio no tiene issues o los tiene deshabilitados, se informa durante
 el progreso y el resto continúa. `--max-pages N` permite limitar las páginas de
 100 issues por repositorio; `0` (por defecto) significa sin límite.
 
+La paginación sigue los headers `Link` de GitHub. En repositorios con muchísimos
+issues, GitHub usa paginación por cursor (`after`/`before`) y rechaza `page` a
+partir de la página 100; el script detecta ese caso y continúa solo con el
+cursor.
+
 ### 5. Filtrar issues relacionados con `gh-aw`
 
 ```bash

@@ -51,7 +51,9 @@ import argparse
 import csv
 import json
 import random
+import re
 import sys
+import urllib.parse
 from pathlib import Path
 from typing import Any, Iterator
 
@@ -167,20 +169,54 @@ def resolve_repositories(args: argparse.Namespace) -> list[str]:
     return list(dict.fromkeys(repo for repo in repos if repo))
 
 
+def next_page_url(headers: Any) -> str | None:
+    """Extrae la URL con rel=\"next\" del header Link de GitHub."""
+    link_header = headers.get("Link") if headers else None
+    if not link_header:
+        return None
+
+    for part in link_header.split(","):
+        match = re.search(r'<([^>]+)>\s*;\s*rel="([^"]+)"', part.strip())
+        if match and match.group(2) == "next":
+            return match.group(1)
+    return None
+
+
+def cursor_url(url: str) -> str:
+    """Quita `page` cuando la URL usa paginación por cursor (after/before).
+
+    GitHub incluye `page` y `after` juntos en el Link de repositorios con
+    muchísimos issues. Si se sigue esa URL tal cual, la API responde 422 a
+    partir de la página 100. Para esos casos hay que usar solo el cursor.
+    """
+    parts = urllib.parse.urlsplit(url)
+    query = urllib.parse.parse_qsl(parts.query, keep_blank_values=True)
+    if any(key in {"after", "before"} for key, _ in query):
+        query = [(key, value) for key, value in query if key != "page"]
+    return urllib.parse.urlunsplit(
+        (
+            parts.scheme,
+            parts.netloc,
+            parts.path,
+            urllib.parse.urlencode(query),
+            parts.fragment,
+        )
+    )
+
+
 def iter_issues(
     api: GitHubAPI,
     repo: str,
     max_pages: int = 0,
     verbose: bool = True,
 ) -> Iterator[dict[str, Any]]:
-    """Itera issues reales (sin pull requests) de todas las páginas."""
-    page = 1
+    """Itera issues reales (sin pull requests) siguiendo los Link de GitHub."""
+    url = f"/repos/{repo}/issues?state=all&per_page=100"
+    page = 0
 
     while True:
-        data, _ = api.get_json(
-            f"/repos/{repo}/issues",
-            {"state": "all", "per_page": 100, "page": page},
-        )
+        page += 1
+        data, headers = api.get_json(url)
         if data is None:
             if verbose:
                 print("    sin issues o issues deshabilitados")
@@ -197,11 +233,15 @@ def iter_issues(
 
         yield from real_issues
 
-        if len(batch) < 100:
+        if not batch:
             break
         if max_pages and page >= max_pages:
             break
-        page += 1
+
+        next_url = next_page_url(headers)
+        if not next_url:
+            break
+        url = cursor_url(next_url)
 
 
 def repository_name(repo: str) -> str:
