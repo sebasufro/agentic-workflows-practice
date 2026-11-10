@@ -14,6 +14,10 @@ Herramientas para estudiar el uso de GitHub Agentic Workflows (`gh-aw`):
   CSV de `issues/` y genera `filtered_issues/agentic_issues.csv` con los issues
   relacionados con `gh-aw`, según título, descripción, etiquetas y CI/CD.
   Ver [instrucciones](scripts/README.md).
+- [`scripts/repo_analyze_issues.py`](scripts/repo_analyze_issues.py): clasifica
+  los issues filtrados por origen (automático de `gh-aw` o humano), tipo de
+  problema, causa probable y resolución. Genera `analysis/issues_enriched.csv`
+  y `analysis/summary.md`. Ver [instrucciones](scripts/README.md).
 
 ```bash
 # Opción A: crear .env en la raíz con GITHUB_TOKEN=ghp_...
@@ -31,6 +35,9 @@ python scripts/repo_fetch_issues.py --repos-file repos.json --limit 10
 
 # Filtrar los CSV de issues/ y generar filtered_issues/agentic_issues.csv
 python scripts/repo_filter_issues.py
+
+# Analizar los issues filtrados y generar reportes en analysis/
+python scripts/repo_analyze_issues.py
 
 # Elegir un subconjunto antes de gastar llamadas (quitar --dry-run para ejecutar)
 python scripts/repo_scan_actions.py batch --repos-file repos.json --org PowerShell --limit 5 --dry-run

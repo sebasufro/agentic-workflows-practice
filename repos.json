@@ -1,20 +1,30 @@
 {
-  "generated_at": "2026-11-02 01:02 UTC",
+  "generated_at": "2026-11-10 16:19 UTC",
   "source": "github",
   "queries": [
     "gh-aw-metadata path:.github/workflows"
   ],
-  "total_count": 5496,
+  "total_count": 6224,
   "truncated": true,
   "repositories": {
     "0GiS0/0gis0": [
       ".github/workflows/smart-labeler.lock.yml"
     ],
+    "0GiS0/github-agentic-workflows": [
+      ".github/workflows/issue-quality-enhancer.lock.yml"
+    ],
+    "0GiS0/sopla-el-cartucho-en-jueves-de-quack": [
+      ".github/workflows/issue-enhancer.lock.yml"
+    ],
+    "22085/duckduckgo-android": [
+      ".github/workflows/drift-audit.lock.yml"
+    ],
     "2ooks/knowledge-base": [
       ".github/workflows/new-source-alert.lock.yml"
     ],
     "AIDLC-Research-1/my_app": [
-      ".github/workflows/auto-labeler.lock.yml"
+      ".github/workflows/auto-labeler.lock.yml",
+      ".github/workflows/documentation-agent.lock.yml"
     ],
     "Activiti/Activiti": [
       ".github/workflows/supply-chain-review.lock.yml"
@@ -25,57 +35,119 @@
     "Agoric/agoric-sdk": [
       ".github/workflows/ci-doctor.lock.yml"
     ],
+    "Alejandrolmeida/squad": [
+      ".github/workflows/squad.lock.yml"
+    ],
     "Alexz1008/FileUpload-Frontend": [
       ".github/workflows/issue-triage.lock.yml"
     ],
+    "Alfresco/alfresco-ng2-components": [
+      ".github/workflows/supply-chain-review.lock.yml"
+    ],
     "Alvin-Wu-Garden/COBOL2SPEC": [
+      ".github/workflows/documentation-audit.lock.yml",
       ".github/workflows/documentation-updater.lock.yml"
+    ],
+    "AndressaSiqueira/AgenticRepo": [
+      ".github/workflows/issue-triage.lock.yml"
+    ],
+    "Ardhendu7/AgenticWorkflowDemo": [
+      ".github/workflows/weekly-report-status.lock.yml"
+    ],
+    "Armor-test/argo-cd": [
+      ".github/workflows/issue-triage.lock.yml"
+    ],
+    "AymaneThecoder/skills-agentic-workflows-that-read-the-room": [
+      ".github/workflows/update-github-info.lock.yml"
     ],
     "Azure-Samples/Legacy-Modernization-Agents": [
-      ".github/workflows/documentation-updater.lock.yml"
+      ".github/workflows/documentation-updater.lock.yml",
+      ".github/workflows/test-enhancer.lock.yml"
     ],
     "Azure/ARO-HCP": [
-      ".github/workflows/gh-aw-recompile.lock.yml",
       ".github/workflows/tool-version-updates.lock.yml"
     ],
     "Azure/AppConfiguration": [
       ".github/workflows/issue-triage.lock.yml"
     ],
-    "Azure/azure-dev": [
-      ".github/workflows/update-instructions-from-pr-reviews.lock.yml"
+    "Azure/Azure-Landing-Zones": [
+      ".github/workflows/issue-triage.lock.yml"
+    ],
+    "Azure/LogicAppsUX": [
+      ".github/workflows/issue-triage-agent.lock.yml"
+    ],
+    "Azure/agent-app-orchestrator": [
+      ".github/workflows/issue-type-classifier.lock.yml"
+    ],
+    "Azure/apiops-cli": [
+      ".github/workflows/doc-freshness.lock.yml",
+      ".github/workflows/issue-go-yes.lock.yml",
+      ".github/workflows/issue-triage.lock.yml"
     ],
     "Azure/azure-rest-api-specs": [
       ".github/workflows/hero-scenarios.lock.yml"
     ],
-    "Azure/azure-sdk-for-java": [
-      ".github/workflows/issue-triage.lock.yml"
-    ],
     "Azure/azure-sdk-for-js": [
-      ".github/workflows/docs-consistency-check.lock.yml"
+      ".github/workflows/dash.lock.yml",
+      ".github/workflows/docs-consistency-check.lock.yml",
+      ".github/workflows/mgmt-guidance.lock.yml"
+    ],
+    "Azure/azure-sdk-for-python": [
+      ".github/workflows/issue-triage.lock.yml"
     ],
     "Azure/bicep-ptn-aiml-landing-zone": [
       ".github/workflows/issue-type-classifier.lock.yml"
     ],
-    "Azure/typespec-azure": [
-      ".github/workflows/doc-update.lock.yml",
-      ".github/workflows/docs-sync.lock.yml"
+    "Azure/git-ape": [
+      ".github/workflows/daily-repo-status.lock.yml",
+      ".github/workflows/issue-triage-agent.lock.yml"
+    ],
+    "BenjaminMichaelis/agentic-workflows-introduction": [
+      ".github/workflows/ci-doctor.lock.yml"
     ],
     "Bertverbeek4PS/bc2adls": [
       ".github/workflows/ai-moderator.lock.yml",
+      ".github/workflows/auto-triage-issues.lock.yml",
       ".github/workflows/pr-triage-agent.lock.yml"
     ],
     "Bixbott/bixbott-cli": [
-      ".github/workflows/handle-documentation.lock.yml"
+      ".github/workflows/cross-repo-issue-analysis.lock.yml",
+      ".github/workflows/handle-bug.lock.yml",
+      ".github/workflows/handle-documentation.lock.yml",
+      ".github/workflows/release-changelog.lock.yml"
+    ],
+    "BridgingIT-GmbH/bITdevKit": [
+      ".github/workflows/ci-fault-analysis.lock.yml",
+      ".github/workflows/continuous-docs.lock.yml"
+    ],
+    "ChristianPresley/github-actions-agentic-workflows": [
+      ".github/workflows/pipeline-failure-analyst.lock.yml"
+    ],
+    "CubikRuubik/rust-prism": [
+      ".github/workflows/rust-sync-from-golang-pr.lock.yml"
     ],
     "DREAM-XIN/ai-sdlc": [
+      ".github/workflows/ai-sdlc-gh-aw-orchestrator-copilot.lock.yml",
+      ".github/workflows/ai-sdlc-gh-aw-product-copilot.lock.yml",
+      ".github/workflows/ai-sdlc-gh-aw-qa-deepseek-v03-release-local.lock.yml",
+      ".github/workflows/ai-sdlc-gh-aw-qa-deepseek-v03-structured-inline-local.lock.yml",
       ".github/workflows/ai-sdlc-gh-aw-qa-gemini.lock.yml",
-      ".github/workflows/ai-sdlc-gh-aw-reviewer-deepseek-v03-structured-local.lock.yml"
+      ".github/workflows/ai-sdlc-gh-aw-reviewer-deepseek-v03-structured-local.lock.yml",
+      ".github/workflows/ai-sdlc-gh-aw-worker-qwen.lock.yml"
     ],
     "Datamazin/mlb-report-github-actions": [
       ".github/workflows/pbir-report-rules-check.lock.yml"
     ],
     "DavidDiaz0317/console-visual-hive-trial-20260720": [
-      ".github/workflows/auto-triage.lock.yml"
+      ".github/workflows/auto-triage.lock.yml",
+      ".github/workflows/handle-complications.lock.yml.disabled"
+    ],
+    "DavidDiaz0317/console-visual-hive-trial-20260720-v2": [
+      ".github/workflows/auto-triage.lock.yml",
+      ".github/workflows/handle-complications.lock.yml.disabled"
+    ],
+    "DavidHu-Rogers/demo_copolit": [
+      ".github/workflows/auto-analyze-failures.lock.yml"
     ],
     "Dedac/Beam": [
       ".github/workflows/fix-top-improvement.lock.yml"
@@ -83,11 +155,23 @@
     "DefaceRoot/agentic-documentation": [
       ".github/workflows/doc-sync.lock.yml"
     ],
+    "DevExpGbb/gh-devlake": [
+      ".github/workflows/docs-sync.lock.yml"
+    ],
+    "Ditto190/mcapp-ai-starter": [
+      ".github/workflows/ac-delivery-validator.lock.yml"
+    ],
     "Ditto190/modme-ui-01": [
       ".github/workflows/workflow-health.lock.yml"
     ],
     "EvergineTeam/Embree.NET": [
       ".github/workflows/ci-doctor.lock.yml"
+    ],
+    "EvergineTeam/Evergine.Bindings": [
+      ".github/workflows/toolbox-updater.yml"
+    ],
+    "EvergineTeam/ImGui.Net": [
+      ".github/workflows/binding-updater.lock.yml"
     ],
     "EvergineTeam/Meshoptimizer.NET": [
       ".github/workflows/ci-doctor.lock.yml"
@@ -104,36 +188,66 @@
     "EvergineTeam/Tracy.NET": [
       ".github/workflows/ci-doctor.lock.yml"
     ],
-    "FamilySearch/pewpew": [
-      ".github/workflows/dependency-agent.lock.yml"
+    "FVossebeld/FVossebeld.github.io": [
+      ".github/workflows/wiki-lint.lock.yml"
     ],
-    "Hack23/euparliamentmonitor": [
-      ".github/workflows/news-month-ahead.lock.yml",
-      ".github/workflows/news-week-in-review.lock.yml"
+    "Fer-Vega-uni/Proyecto-analisis-cs": [
+      ".github/workflows/security-scan-copilot.lock.yml"
+    ],
+    "Gepardec/lf-projekt-agenten-in-pipelines": [
+      ".github/workflows/daily-release-notes-report.lock.yml"
+    ],
+    "GiantCroissant-Lunar/swimming-tuna": [
+      ".github/workflows/review-resolve.lock.yml"
     ],
     "HewlettPackard/morpheus-docs": [
       ".github/workflows/localize-pt.lock.yml"
     ],
-    "Imperia360/Imperia360": [
-      ".github/workflows/imperia-market-prices.lock.yml"
+    "Hukmaram/skills-agentic-workflows-that-read-the-room": [
+      ".github/workflows/update-github-info.lock.yml"
     ],
-    "IonutCava/Divide-Framework": [
-      ".github/workflows/ci-coach.lock.yml"
+    "IgniteUI/igniteui-documentation": [
+      ".github/workflows/sync-jp-docs-angular.lock.yml"
+    ],
+    "IgorBabkin/ts-ioc-container": [
+      ".github/workflows/issue-to-draft-pr.lock.yml"
     ],
     "IraLeeBell/hyperfinite": [
-      ".github/workflows/adaptive-delivery-test-and-verification.lock.yml"
+      ".github/workflows/adaptive-delivery-test-and-verification.lock.yml",
+      ".github/workflows/feature-delivery-codebase-discovery.lock.yml",
+      ".github/workflows/security-dependency-remediation-remediation-design.lock.yml"
     ],
     "JKamsker/DotBoxD": [
-      ".github/workflows/library-surprise-fix.lock.yml"
+      ".github/workflows/library-surprise-explore.lock.yml",
+      ".github/workflows/library-surprise-fix.lock.yml",
+      ".github/workflows/library-surprise-sweep.lock.yml"
     ],
     "Jguer/yay": [
       ".github/workflows/repo-assist.lock.yml"
     ],
+    "Josephine-LiMin/skills-agentic-workflows-that-read-the-room": [
+      ".github/workflows/update-github-info.lock.yml"
+    ],
     "JoshGreenslade/RainChart": [
       ".github/workflows/scan-new-issues.lock.yml"
     ],
+    "JuanPablo2100/kitten-agent-blog": [
+      ".github/workflows/squad.lock.yml"
+    ],
     "JustSirDave/poe": [
       ".github/workflows/issue-triage.lock.yml"
+    ],
+    "Justrebl/AI-SDLC-WKSDay": [
+      ".github/workflows/workshop-tester.lock.yml"
+    ],
+    "Justrebl/AI-SDLC-Workshop": [
+      ".github/workflows/workshop-tester.lock.yml"
+    ],
+    "KGoovaer/EcommerceApplication": [
+      ".github/workflows/doc-orchestrator.lock.yml"
+    ],
+    "Karkina/TestAgentPlaywright": [
+      ".github/workflows/agent-planner-staiot.lock.yml"
     ],
     "Kenblair1226/agentic-sdlc-workshop-wistron": [
       ".github/workflows/repo-status.lock.yml"
@@ -141,19 +255,41 @@
     "Kludex/zigai": [
       ".github/workflows/dependency-api-monitor.lock.yml"
     ],
+    "Kong/kongctl": [
+      ".github/workflows/benchmark-regression-analysis.lock.yml"
+    ],
+    "KunalSin9h/meltcd": [
+      ".github/workflows/new.lock.yml"
+    ],
     "LeMegaGeek/bgobs": [
       ".github/workflows/validate-pr.lock.yml"
+    ],
+    "Liming201909016/ESP2": [
+      ".github/workflows/agent-findings-audit.lock.yml"
     ],
     "LuisiitoDev/skills-agentic-workflows-that-read-the-room": [
       ".github/workflows/update-github-info.lock.yml"
     ],
-    "MaggieAppleton/maggieappleton.com-V3": [
-      ".github/workflows/draft-research.lock.yml",
-      ".github/workflows/implementer.lock.yml",
-      ".github/workflows/planner.lock.yml"
+    "MH0386/nurpkgs": [
+      ".github/workflows/ci-doctor.lock.yml"
+    ],
+    "MarcosCobena/GoTo": [
+      ".github/workflows/agent-triager.lock.yml"
+    ],
+    "Martz/agentic-factory-starter": [
+      ".github/workflows/factory-spec.lock.yml"
+    ],
+    "MasonOrg357/ghaw-public-search-fixture-20260915": [
+      ".github/workflows/ghaw-discussion-integrity.lock.yml"
+    ],
+    "Matusik1995/skills-agentic-workflows-that-read-the-room": [
+      ".github/workflows/update-github-info.lock.yml"
     ],
     "MeryPonfe/kitten-agent-blog": [
       ".github/workflows/squad.lock.yml"
+    ],
+    "MicrosoftDocs/architecture-center": [
+      ".github/workflows/github-sample-report.lock.yml"
     ],
     "Miguel19671967/kitten-agent-blog1": [
       ".github/workflows/luna.lock.yml"
@@ -161,8 +297,20 @@
     "MiguelElGallo/mpzsql": [
       ".github/workflows/code-simplifier.lock.yml"
     ],
+    "MoimHossain/agentic-workflow-playground": [
+      ".github/workflows/issue-triage.lock.yml"
+    ],
     "MoiraeSoftware/Myriad": [
       ".github/workflows/q.lock.yml"
+    ],
+    "MoseLu/axi-pet": [
+      ".github/workflows/pr-triage.lock.yml"
+    ],
+    "Naren3333/lazygit-triage": [
+      ".github/workflows/issue-triage.lock.yml"
+    ],
+    "NewFuture/openclaw-weixin": [
+      ".github/workflows/maintenance-report.lock.yml"
     ],
     "NichUK/FixedPointNano": [
       ".github/workflows/repo-assist.lock.yml"
@@ -174,19 +322,32 @@
       ".github/workflows/keybot.lock.yml"
     ],
     "Nikila99gimhan/session-beyond-failed-ci": [
-      ".github/workflows/ci-investigator.lock.yml"
+      ".github/workflows/ci-investigator.lock.yml",
+      ".github/workflows/shared-module-investigator.lock.yml"
+    ],
+    "Nithinlinga/spring-boot-demo-workflow": [
+      ".github/workflows/daily-repo-status.lock.yml"
     ],
     "OktayCopurlu/ai-shared": [
+      ".github/workflows/phase-05-code-review.lock.yml",
       ".github/workflows/phase-07-ui-validation.lock.yml"
     ],
     "PowerShell/vscode-powershell": [
-      ".github/workflows/issue-triage.lock.yml",
       ".github/workflows/stale-closer.lock.yml"
     ],
     "ROCm/k8s-gpu-dra-driver": [
       ".github/workflows/cve-fix.lock.yml"
     ],
+    "Rafa-Palomino/kitten-squad-blog": [
+      ".github/workflows/squad.lock.yml"
+    ],
+    "RickardHF/Autonomous-Developer-Workflows": [
+      ".github/workflows/issue-priority-triage.lock.yml"
+    ],
     "RjBiermann/fictional-octo-fiesta": [
+      ".github/workflows/00-retry.lock.yml",
+      ".github/workflows/01-queue-watcher.lock.yml",
+      ".github/workflows/03-backlog-triage.lock.yml",
       ".github/workflows/06-review.lock.yml"
     ],
     "SSWConsulting/SSW.ContentHawk": [
@@ -196,6 +357,8 @@
       ".github/workflows/issue-triage.lock.yml"
     ],
     "SSWConsulting/SSW.Rules.Content": [
+      ".github/workflows/content-campaign.lock.yml",
+      ".github/workflows/content-fixer.lock.yml",
       ".github/workflows/content-judge-pr.lock.yml",
       ".github/workflows/content-judge.lock.yml",
       ".github/workflows/semrush-fixer.lock.yml"
@@ -203,11 +366,23 @@
     "SSWConsulting/SSW.Website": [
       ".github/workflows/auto-approve-content-changes.lock.yml"
     ],
+    "Samadhi-Ayodhya-Gamaarachchi/skills-agentic-workflows-that-read-the-room-samadhi": [
+      ".github/workflows/update-github-info.lock.yml"
+    ],
+    "Sanjai451/LearnGitHubActions": [
+      ".github/workflows/pr-code-review.lock.yml"
+    ],
+    "SebastienDegodez/agentic-project-demo": [
+      ".github/workflows/acceptance-designer.lock.yml"
+    ],
     "SebastienDegodez/meetup-coding-with-ai": [
       ".github/workflows/backlog-planner.lock.yml"
     ],
     "Shazwazza/Examine": [
       ".github/workflows/perf-improver.lock.yml"
+    ],
+    "SinLess-Games/Infrastructure": [
+      ".github/workflows/docs-site.lock.yml"
     ],
     "SkylineCommunications/Skyline.DataMiner.Dev.Utils.Solutions.MediaOps.Live": [
       ".github/workflows/rn-write.lock.yml"
@@ -217,6 +392,18 @@
     ],
     "Software-SE-Pod/storyplan": [
       ".github/workflows/storyplan.lock.yml"
+    ],
+    "Soulike/knowledge-base": [
+      ".github/workflows/verify-evergreen-knowledge.lock.yml"
+    ],
+    "TechWatching/ghcopilotdevdays2026": [
+      ".github/workflows/pr-doc-updater.lock.yml"
+    ],
+    "TedTschopp/tedt.org": [
+      ".github/workflows/daily-report.lock.yml"
+    ],
+    "The-Nasa/codeguardian-ai": [
+      ".github/workflows/codex-review.lock.yml"
     ],
     "The-weyland-yutani-corporation/dark-factory-demo": [
       ".github/workflows/coding-agent-assignment.lock.yml"
@@ -228,39 +415,91 @@
       ".github/workflows/squad-review.lock.yml"
     ],
     "The-weyland-yutani-corporation/project-krypto-dog": [
+      ".github/workflows/agentic-corrections.lock.yml",
       ".github/workflows/pr-self-heal.lock.yml"
     ],
     "TheLarkInn/aipm": [
+      ".github/workflows/daily-qa.lock.yml",
       ".github/workflows/gh-aw-drift.yml"
     ],
-    "TheLeafVillage/agentic-workflows-ci-test-4": [
-      ".github/workflows/autofix-ci.lock.yml"
+    "Themis128/cloudless.gr": [
+      ".github/workflows/monitoring-node-selector-fix.lock.yml"
+    ],
+    "Themis128/figma-cloud-portfolio": [
+      ".github/workflows/backup-restore.lock.yml",
+      ".github/workflows/test-coverage-report.lock.yml"
     ],
     "TruvetaPublic/OpenLinkToken": [
       ".github/workflows/daily-doc-updater.lock.yml"
     ],
+    "Tyler-R-Kendrick/agentic-metacognition": [
+      ".github/workflows/daily-gh-aw-training.lock.yml"
+    ],
     "Tyler-R-Kendrick/gh-aw-mcp-approval-queue": [
       ".github/workflows/mcp-deploy.lock.yml"
     ],
+    "Tyler-R-Kendrick/gh-aw-sdlc": [
+      ".github/workflows/pr-contribution-check.lock.yml"
+    ],
+    "Tyler-R-Kendrick/tk-technews": [
+      ".github/workflows/daily-source-generation.lock.yml"
+    ],
     "UnclesTavern/CopilotAdventures": [
-      ".github/workflows/agents-md-maintenance.lock.yml"
+      ".github/workflows/agents-md-maintenance.lock.yml",
+      ".github/workflows/instructions-janitor.lock.yml"
     ],
     "Unity-Billal-mesloub/msbuild": [
       ".github/workflows/review.agent.lock.yml"
     ],
     "VSadov/Satori": [
+      ".github/workflows/breaking-change-doc.lock.yml",
       ".github/workflows/ci-failure-fix.lock.yml",
       ".github/workflows/holistic-review.lock.yml"
+    ],
+    "VeVarunSharma/build-days-agentic-sdlc": [
+      ".github/workflows/issue-clarifier.lock.yml"
     ],
     "VeVarunSharma/contoso-vibe-engineering": [
       ".github/workflows/pr-merge-assistant.lock.yml"
     ],
+    "VeVarunSharma/pokemon-holomart": [
+      ".github/workflows/qa-user-behaviour.lock.yml"
+    ],
     "Viktor-Jensen-Torp/gh-aw-spike-target": [
       ".github/workflows/review.lock.yml"
+    ],
+    "Waldron63/skills-agentic-workflows-that-read-the-room": [
+      ".github/workflows/update-github-info.lock.yml"
+    ],
+    "WordPress/grunt-patch-wordpress": [
+      ".github/workflows/dependabot-pr-review.lock.yml"
     ],
     "Wu-02/z3-noodler": [
       ".github/workflows/api-coherence-checker.lock.yml",
       ".github/workflows/release-notes-updater.lock.yml"
+    ],
+    "YukiiKazunomiya/Project-airi": [
+      ".github/workflows/pr-triage.lock.yml"
+    ],
+    "Z3Prover/z3": [
+      ".github/workflows/academic-citation-tracker.lock.yml",
+      ".github/workflows/code-conventions-analyzer.lock.yml",
+      ".github/workflows/pulse-checker-repair.lock.yml"
+    ],
+    "ZSWatch/ZSWatch": [
+      ".github/workflows/docs-pr-analyze.lock.yml"
+    ],
+    "ZachDreamZ/console": [
+      ".github/workflows/handle-complications.lock.yml.disabled"
+    ],
+    "aarongustafson/aaron-gustafson.com": [
+      ".github/workflows/repo-assist.lock.yml"
+    ],
+    "aaronspindler/agentics": [
+      ".github/workflows/agents-doc-sync.lock.yml"
+    ],
+    "abdigbiru/skills-agentic-workflows-that-read-the-room": [
+      ".github/workflows/update-github-info.lock.yml"
     ],
     "abrahamFerga/plenipo-agents": [
       ".github/workflows/marketplace-harness-gap-triage.lock.yml"
@@ -279,8 +518,8 @@
     "adoptium/adoptium-support": [
       ".github/workflows/triage-issues.lock.yml"
     ],
-    "adoptium/containers": [
-      ".github/workflows/dockerfile-readiness.lock.yml"
+    "adoptium/adoptium.net": [
+      ".github/workflows/modernize-apply.lock.yml"
     ],
     "adrianmg/test-repo": [
       ".github/workflows/issue-triage.lock.yml"
@@ -288,8 +527,11 @@
     "adrianmg/test-repo-1": [
       ".github/workflows/issue-triage.lock.yml"
     ],
-    "agent-receipts/obsigna": [
-      ".github/workflows/bug-triage.lock.yml"
+    "advanced-security/advanced-security-material": [
+      ".github/workflows/codeql-version-tracker.lock.yml"
+    ],
+    "aetos382/BlueBlaze": [
+      ".github/workflows/build-failure-analysis.lock.yml"
     ],
     "agstya/healthcare-ai-bedrock-mcp": [
       ".github/workflows/issue-triage.lock.yml"
@@ -300,48 +542,93 @@
     "aidevme/PPTB-Tools": [
       ".github/workflows/pptb-intake-review.lock.yml"
     ],
+    "ajpaulson18-design/openpoker-lab": [
+      ".github/workflows/automated-remediation.lock.yml"
+    ],
+    "aktsmm/daily-dev-byte": [
+      ".github/workflows/daily-dev-byte.lock.yml"
+    ],
+    "aktsmm/m365-copilot-update-digest": [
+      ".github/workflows/maintenance.lock.yml"
+    ],
     "aktsmm/vscode-copilot-digest": [
       ".github/workflows/maintain.lock.yml"
+    ],
+    "alexss200010/agentic-workflows-that-read-the-room": [
+      ".github/workflows/community-digest.lock.yml"
     ],
     "almazom/agent-test-demo": [
       ".github/workflows/ask-ai.lock.yml"
     ],
+    "amalgamated-tools/enlace": [
+      ".github/workflows/update-docs.lock.yml"
+    ],
     "amalgamated-tools/goauth": [
+      ".github/workflows/go-fan.lock.yml",
+      ".github/workflows/q.lock.yml",
       ".github/workflows/update-docs.lock.yml",
       ".github/workflows/weekly-malicious-code-scan.lock.yml"
     ],
+    "amenocal/agentic-workflow-workshop": [
+      ".github/workflows/autofix-ci.lock.yml"
+    ],
     "amir0135/agent-factory": [
       ".github/workflows/ci-doctor.lock.yml"
+    ],
+    "amjithtitus09/care_fe": [
+      ".github/workflows/needs-human-triage.lock.yml",
+      ".github/workflows/thank-you-note.lock.yml"
     ],
     "andy952/skills-agentic-workflows-that-read-the-room": [
       ".github/workflows/update-github-info.lock.yml"
     ],
     "andyhutch77/velocity-generator-rs": [
-      ".github/workflows/plan.lock.yml"
+      ".github/workflows/pr-review.lock.yml"
     ],
     "andystumpp/inlinr": [
+      ".github/workflows/drift-auditor.lock.yml",
+      ".github/workflows/monitoring-scenarios.lock.yml",
       ".github/workflows/repo-audit-analyzer.lock.yml"
+    ],
+    "annabel/VitalTrack": [
+      ".github/workflows/daily-repo-status.lock.yml"
     ],
     "anshulshah99/peer-code-review-tool": [
       ".github/workflows/goal.lock.yml"
     ],
-    "antithesishq/snouty": [
-      ".github/workflows/weekly-audit.lock.yml"
+    "arifariofficial/agentic-workflows": [
+      ".github/workflows/update-github-info.lock.yml"
+    ],
+    "arikbidny/gh-aw-demo": [
+      ".github/workflows/weekly-research.lock.yml"
     ],
     "armandoblanco/gh-aw-agentic-demos": [
       ".github/workflows/demo-3-ci-doctor.lock.yml"
     ],
     "arp-0515/Automatic-barrier": [
-      ".github/workflows/issue-triage.lock.yml"
+      ".github/workflows/issue-triage.lock.yml",
+      ".github/workflows/pr-review-checklist.lock.yml"
     ],
-    "astronomer/dag-factory": [
-      ".github/workflows/review-bot-prs.lock.yml"
+    "asizikov-demos/copilot-premium-requests-report-viewer": [
+      ".github/workflows/code-duplication-scan.lock.yml"
     ],
-    "atlascopco-Lab/atlas-copilot-agent-labs": [
-      ".github/workflows/industry-insight.lock.yml"
+    "asizikov-demos/copilot-user-level-statistics-viewer": [
+      ".github/workflows/code-duplication-scan.lock.yml"
+    ],
+    "askb/ha-garmin-fitness-coach-addon": [
+      ".github/workflows/garmin-addon-daily-health.lock.yml"
     ],
     "attentiondotnet/winget-tui": [
       ".github/workflows/repo-assist.lock.yml"
+    ],
+    "autonomous-bits/nomos": [
+      ".github/workflows/docs-sync.lock.yml"
+    ],
+    "aymenfurter/aw-azdo": [
+      ".github/workflows/acceptance-criteria-gen.lock.yml"
+    ],
+    "aztfmod/terraform-provider-azurecaf": [
+      ".github/workflows/release-labeler.lock.yml"
     ],
     "baizhiheizi/botstrap": [
       ".github/workflows/daily-doc-updater.lock.yml"
@@ -349,26 +636,77 @@
     "baizhiheizi/gh-sr": [
       ".github/workflows/upstream-tracker.lock.yml"
     ],
-    "bebebus/SDK": [
-      ".github/workflows/pull-request-reviewer.lock.yml"
+    "baizhiheizi/mixin_bot": [
+      ".github/workflows/doc-updater.lock.yml"
+    ],
+    "bcgov/tier2-pattern-test": [
+      ".github/workflows/tier1-ci-diagnose.lock.yml"
+    ],
+    "beardofedu/it-summit-copilot-bootcamp": [
+      ".github/workflows/question-summarizer.lock.yml"
+    ],
+    "beardofedu/it-summit-copilot-chat": [
+      ".github/workflows/question-summarizer.lock.yml"
+    ],
+    "beardofedu/it-summit-copilot-enterprise": [
+      ".github/workflows/question-summarizer.lock.yml"
+    ],
+    "benbalter/wordpress-static-site-exporter": [
+      ".github/workflows/release-notes.lock.yml"
     ],
     "bhati00/go-micro": [
       ".github/workflows/grumpy-reviewer.lock.yml"
     ],
+    "binggao1230/pydantic-ai-groq-fix": [
+      ".github/workflows/pydantic-ai-provider-mapping-sweep.lock.yml"
+    ],
     "bitcoder/tutorial-spring": [
       ".github/workflows/issue-clarifier.lock.yml"
+    ],
+    "bl1nk-bot/bl1z": [
+      ".github/workflows/repo-assist.lock.yml"
+    ],
+    "bmerkle/gh-aw-python-project": [
+      ".github/workflows/agent-performance-analyzer.lock.yml",
+      ".github/workflows/python-format-typecheck.lock.yml"
     ],
     "bootc-dev/actions": [
       ".github/workflows/fix.lock.yml",
       ".github/workflows/review.lock.yml"
     ],
     "bootc-dev/bcvk": [
-      ".github/workflows/drafter.lock.yml"
+      ".github/workflows/drafter.lock.yml",
+      ".github/workflows/fix.lock.yml",
+      ".github/workflows/review.lock.yml"
     ],
     "bootc-dev/bootc": [
       ".github/workflows/drafter.lock.yml",
       ".github/workflows/fix.lock.yml",
       ".github/workflows/review.lock.yml"
+    ],
+    "cabird/graphrag_minus_1_test": [
+      ".github/workflows/code-simplifier.lock.yml"
+    ],
+    "canonical/authd": [
+      ".github/workflows/issue-backlog-cleanup.lock.yml"
+    ],
+    "canonical/ubuntu.com": [
+      ".github/workflows/copilot-assignment.lock.yml"
+    ],
+    "carlkidcrypto/ezsnmp": [
+      ".github/workflows/auto_change_log.lock.yml",
+      ".github/workflows/auto_release_notes.lock.yml",
+      ".github/workflows/coverage_autofix_cpp.lock.yml"
+    ],
+    "carlkidcrypto/ezsnmp_data_logger": [
+      ".github/workflows/coverage_autofix_cpp.lock.yml",
+      ".github/workflows/docs_continuous_improvement.lock.yml"
+    ],
+    "carlkidcrypto/purpleair_data_logger": [
+      ".github/workflows/auto_change_log.lock.yml"
+    ],
+    "castrojo/bluestellar": [
+      ".github/workflows/handle-complications.lock.yml.disabled"
     ],
     "chf3198/megingjord-harness": [
       ".github/workflows/model-diversity-advisory-aw.lock.yml"
@@ -376,8 +714,28 @@
     "chin00kz/UnifiedOperationsConsole": [
       ".github/workflows/weekly-repo-status.lock.yml"
     ],
+    "chrisreddington/flight-school": [
+      ".github/workflows/daily-qa.lock.yml",
+      ".github/workflows/issue-triage.lock.yml"
+    ],
     "chrizbo/agentics-beyond-code": [
-      ".github/workflows/sample-data-launch-creator.lock.yml"
+      ".github/workflows/compliance-review.lock.yml",
+      ".github/workflows/intake-triage.lock.yml",
+      ".github/workflows/launch-readiness.lock.yml",
+      ".github/workflows/sample-data-launch-creator.lock.yml",
+      ".github/workflows/workflow-health.lock.yml"
+    ],
+    "clientfirsttech/github-agentic-workflow-pbir-analysis-and-fixes-example": [
+      ".github/workflows/pbir-report-rules-check.lock.yml"
+    ],
+    "cncf/contribute-site": [
+      ".github/workflows/link-checker.lock.yml"
+    ],
+    "code-s2/mbu-gh-aw-livedemo": [
+      ".github/workflows/weekly-report-status.lock.yml"
+    ],
+    "codebytes/github-actions-demos": [
+      ".github/workflows/ci-doctor.lock.yml"
     ],
     "codecurrent-sandbox/octo-eshop-demo": [
       ".github/workflows/copilot-demo-scout.lock.yml"
@@ -388,8 +746,18 @@
       ".github/workflows/repo-assist.lock.yml"
     ],
     "composable-delivery/busbar-sf-agentscript": [
+      ".github/workflows/breaking-change-checker.lock.yml",
       ".github/workflows/issue-triage.lock.yml",
       ".github/workflows/weekly-health-report.lock.yml"
+    ],
+    "conpilot-io/kanbanauts": [
+      ".github/workflows/agent-review-claude.lock.yml"
+    ],
+    "conveyordata/data-product-portal": [
+      ".github/workflows/frontend-consistency.lock.yml"
+    ],
+    "copilot-academy/octocat_supply": [
+      ".github/workflows/auto-analyze-failures.lock.yml"
     ],
     "crgasparoto-br/delivery-orchestrator": [
       ".github/workflows/delivery-v2-worker-claude-critical.lock.yml",
@@ -401,10 +769,20 @@
     "cuddy-five/nonkyc": [
       ".github/workflows/implementer.lock.yml"
     ],
+    "cv-gh/up": [
+      ".github/workflows/tech-updates-digest.lock.yml"
+    ],
     "d-c-small/skills-agentic-workflows-that-read-the-room": [
       ".github/workflows/update-github-info.lock.yml"
     ],
+    "daniel-pm19/skills-agentic-workflows-that-read-the-room": [
+      ".github/workflows/update-github-info.lock.yml"
+    ],
+    "danielbodnar/patterson-design-plugins": [
+      ".github/workflows/repo-ask.lock.yml"
+    ],
     "danmoseley/runtime2": [
+      ".github/workflows/agentic-fix-iterate.lock.yml",
       ".github/workflows/api-review.lock.yml"
     ],
     "darpbr/biblioteca-api": [
@@ -416,11 +794,21 @@
     "dayour/agent_office_skills": [
       ".github/workflows/daily-repo-status.lock.yml"
     ],
+    "ddjain/gh-aw": [
+      ".github/workflows/agentic-hello.lock.yml"
+    ],
+    "developerQuo/chopin": [
+      ".github/workflows/weekly-use-effect-review.lock.yml"
+    ],
     "dfrysinger/qrspi-plus": [
-      ".github/workflows/gaw-gaw-actions-end-to-end-proof.lock.yml"
+      ".github/workflows/gaw-gaw-actions-end-to-end-proof.lock.yml",
+      ".github/workflows/gaw-issue-to-pr.lock.yml"
     ],
     "dimagi/commcare-android": [
       ".github/workflows/pr-comment-handler.lock.yml"
+    ],
+    "dimitarfilipov-allocate/catalix-nodejs-client": [
+      ".github/workflows/enhancement-implementer.lock.yml"
     ],
     "djredman99-org/github-agentic-workflows": [
       ".github/workflows/daily-repo-status.lock.yml"
@@ -431,28 +819,52 @@
     "dkhautomation/FormTHcopilot": [
       ".github/workflows/advanced-copilot-cli-sync.lock.yml"
     ],
+    "doggy8088/spec-kit": [
+      ".github/workflows/add-community-extension.lock.yml",
+      ".github/workflows/pr-assess.lock.yml"
+    ],
+    "dorlugasigal/TermBeam": [
+      ".github/workflows/scorecard-monitor.lock.yml",
+      ".github/workflows/security-autofix.lock.yml"
+    ],
     "dotnet/Open-XML-SDK": [
       ".github/workflows/dependabot-pr-bundler.lock.yml"
     ],
     "dotnet/arcade": [
       ".github/workflows/update-default-versions.lock.yml"
     ],
-    "dotnet/macios": [
-      ".github/workflows/ci-postmortem.lock.yml",
-      ".github/workflows/code-radiator.lock.yml",
-      ".github/workflows/macios-reviewer.lock.yml"
+    "dotnet/aspnetcore": [
+      ".github/workflows/pr-attention-pulse-tests/Test-PulseSchedule.cjs"
+    ],
+    "dotnet/core": [
+      ".github/workflows/api-diff-worker.lock.yml"
+    ],
+    "dotnet/fsharp": [
+      ".github/workflows/labelops-pr-maintenance.lock.yml"
     ],
     "dotnet/maui": [
-      ".github/workflows/aw-actions-update.md"
+      ".github/workflows/aw-actions-update.md",
+      ".github/workflows/ci-status-net11.lock.yml",
+      ".github/workflows/leak-fixer.lock.yml"
+    ],
+    "dotnet/maui-labs": [
+      ".github/workflows/ai-docs-audit.lock.yml"
+    ],
+    "dotnet/msbuild": [
+      ".github/workflows/review-on-open.agent.lock.yml"
     ],
     "dotnet/roslyn": [
       ".github/workflows/ai-artifact-audit.lock.yml"
     ],
-    "dotnet/source-build": [
-      ".github/workflows/triage.lock.yml"
+    "dotnet/sdk": [
+      ".github/workflows/resource-lock-refactoring.lock.yml"
     ],
-    "drasi-project/drasi-core": [
-      ".github/workflows/plan-source.lock.yml"
+    "drakkai/gh-aw-workshop": [
+      ".github/workflows/code-simplifier.lock.yml",
+      ".github/workflows/new-day.lock.yml"
+    ],
+    "drasi-project/.github": [
+      ".github/workflows/pr-prior-art-reviewer.lock.yml"
     ],
     "drhelius/Gearboy": [
       ".github/workflows/controller-database-watcher.lock.yml",
@@ -466,11 +878,15 @@
     "drhelius/Geargrafx": [
       ".github/workflows/release.lock.yml"
     ],
-    "drhelius/Gearlynx": [
-      ".github/workflows/release.lock.yml"
-    ],
     "drhelius/Gearsystem": [
       ".github/workflows/release.lock.yml"
+    ],
+    "drhelius/Geartowns": [
+      ".github/workflows/issue-triage.lock.yml",
+      ".github/workflows/release.lock.yml"
+    ],
+    "droosma/vibe-codeGraph": [
+      ".github/workflows/code-simplifier.lock.yml"
     ],
     "dsfaccini/gh-aw-pydantic-ai-demo": [
       ".github/workflows/triage.lock.yml"
@@ -487,162 +903,338 @@
     "dvazqueb11/agentic_workflow": [
       ".github/workflows/self-heal.lock.yml"
     ],
+    "egym/lib-mwa-logger": [
+      ".github/workflows/bma-security-fix.lock.yml"
+    ],
     "elastic/ai-github-actions": [
       ".github/workflows/gh-aw-autonomy-atomicity-analyzer.lock.yml",
       ".github/workflows/gh-aw-estc-newbie-contributor-patrol-external.lock.yml",
       ".github/workflows/gh-aw-flaky-test-investigator.lock.yml",
+      ".github/workflows/gh-aw-issue-fixer-unrestricted.lock.yml",
+      ".github/workflows/gh-aw-refactor-opportunist.lock.yml",
       ".github/workflows/gh-aw-update-pr-body.lock.yml"
     ],
     "elastic/elastic-docs-skills": [
-      ".github/workflows/skill-freshness.lock.yml"
-    ],
-    "elastic/elasticsearch-specification": [
-      ".github/workflows/spec-drift.lock.yml"
-    ],
-    "elastic/oblt-aw": [
-      ".github/workflows/gh-aw-autoapprove.lock.yml"
+      ".github/workflows/skill-freshness.lock.yml",
+      ".github/workflows/skill-quality-review.lock.yml"
     ],
     "elastic/terraform-provider-elasticstack": [
-      ".github/workflows/code-factory-issue.lock.yml"
+      ".github/workflows/code-factory-issue.lock.yml",
+      ".github/workflows/schema-coverage-rotation.lock.yml"
     ],
-    "epicpast/farm-notebook-examples": [
-      ".github/workflows/q.lock.yml"
+    "elbruno/weekly-ai-news-digest": [
+      ".github/workflows/daily-digest-economy.lock.yml"
     ],
-    "epicpast/nsip-example": [
-      ".github/workflows/eov-enrichment.lock.yml"
+    "elefthei/ts-explorer": [
+      ".github/workflows/repo-status.lock.yml"
+    ],
+    "ethanmarten/AI-Agent-By-Github": [
+      ".github/workflows/update-github-info.lock.yml"
     ],
     "ethereum/ethereum-org-website": [
       ".github/workflows/backlog-sweeper.lock.yml"
     ],
+    "evandouglas/FantasyFootballWeeklySummary": [
+      ".github/workflows/weekly-fantasy-recaps.lock.yml"
+    ],
+    "f/wvw.dev": [
+      ".github/workflows/curate-featured.lock.yml"
+    ],
     "fable-compiler/Fable.Python": [
       ".github/workflows/repo-assist.lock.yml"
+    ],
+    "fideus-labs/ngff-zarr": [
+      ".github/workflows/daily-repo-status.lock.yml"
     ],
     "florian-trehaut/pair-speckit": [
       ".github/workflows/add-community-preset.lock.yml"
     ],
-    "fsprojects/FSharp.Control.AsyncSeq": [
+    "foguds/demo": [
+      ".github/workflows/daily-paper-recommendations.lock.yml"
+    ],
+    "fsprojects/FSharp.Data.SqlClient": [
       ".github/workflows/repo-assist.lock.yml"
     ],
-    "fsprojects/FSharp.Control.TaskSeq": [
-      ".github/workflows/repo-assist.lock.yml"
-    ],
-    "fsprojects/FSharp.Data": [
+    "fsprojects/FSharp.TypeProviders.SDK": [
       ".github/workflows/repo-assist.lock.yml"
     ],
     "fsprojects/FsHttp": [
       ".github/workflows/repo-assist.lock.yml"
     ],
-    "fsprojects/Paket": [
-      ".github/workflows/repo-assist.lock.yml"
+    "funfix/continuations4s": [
+      ".github/workflows/agent.lock.yml"
+    ],
+    "funfix/database": [
+      ".github/workflows/agent.lock.yml"
     ],
     "furkanatesc/AI-Engineering-Coach-Claude": [
       ".github/workflows/issue-triage.lock.yml"
     ],
+    "gearsnlevers/ai-changelog-action": [
+      ".github/workflows/pr-triage.lock.yml"
+    ],
+    "gearsnlevers/manifest-version-update-action": [
+      ".github/workflows/pr-triage.lock.yml"
+    ],
+    "gearsnlevers/npm-trusted-publish-action": [
+      ".github/workflows/pr-triage.lock.yml"
+    ],
+    "gearsnlevers/release-preflight-action": [
+      ".github/workflows/pr-triage.lock.yml"
+    ],
+    "gearsnlevers/version-bump-action": [
+      ".github/workflows/pr-triage.lock.yml"
+    ],
     "gilgud123/quote-rest-api": [
       ".github/workflows/pr-quality.lock.yml"
     ],
-    "github/copilot-cli-for-beginners": [
-      ".github/workflows/translation-polisher.lock.yml"
+    "girinalin/copilot-immersive-workshop": [
+      ".github/workflows/auto-analyze-failures.lock.yml"
+    ],
+    "github/awesome-copilot": [
+      ".github/workflows/advanced-copilot-cli-sync.lock.yml",
+      ".github/workflows/learning-hub-updater.lock.yml"
+    ],
+    "github/copilot-app-for-beginners": [
+      ".github/workflows/traffic-updater.lock.yml"
     ],
     "github/gh-aw": [
-      ".github/workflows/agy-conformance-reusable.lock.yml",
-      ".github/workflows/ai-moderator.lock.yml",
-      ".github/workflows/breaking-change-checker.lock.yml",
-      ".github/workflows/daily-ambient-context-optimizer.lock.yml",
-      ".github/workflows/daily-cli-performance.lock.yml",
-      ".github/workflows/daily-fact.lock.yml",
+      ".github/workflows/ace-editor.lock.yml",
+      ".github/workflows/agent-performance-analyzer.lock.yml",
+      ".github/workflows/archie.lock.yml",
+      ".github/workflows/bot-detection.lock.yml",
+      ".github/workflows/cli-version-checker.lock.yml",
+      ".github/workflows/daily-action-setup-security-audit.lock.yml",
+      ".github/workflows/daily-architecture-diagram.lock.yml",
+      ".github/workflows/daily-aw-cross-repo-compile-check.md",
+      ".github/workflows/daily-declarative-engine-improver.lock.yml",
+      ".github/workflows/daily-function-namer.lock.yml",
+      ".github/workflows/daily-go-test-stubs-aider.lock.yml",
+      ".github/workflows/daily-grader-audit.lock.yml",
+      ".github/workflows/daily-model-resolution.lock.yml",
+      ".github/workflows/daily-repo-chronicle.lock.yml",
+      ".github/workflows/daily-safe-output-optimizer.lock.yml",
+      ".github/workflows/daily-spec-coverage-kiro.lock.yml",
+      ".github/workflows/daily-team-status.lock.yml",
       ".github/workflows/daily-token-consumption-report.lock.yml",
-      ".github/workflows/daily-windows-defender-scan.lock.yml",
-      ".github/workflows/docs-noob-tester.lock.yml",
-      ".github/workflows/engine-conformance-gemini.lock.yml",
-      ".github/workflows/feature-grower.lock.yml",
-      ".github/workflows/research.lock.yml",
-      ".github/workflows/semantic-function-refactor.lock.yml",
-      ".github/workflows/smoke-codex-auto.lock.yml",
-      ".github/workflows/smoke-copilot-mai.lock.yml",
-      ".github/workflows/smoke-pi-auto.lock.yml",
-      ".github/workflows/uk-ai-operational-resilience.lock.yml",
-      ".github/workflows/unbloat-docs.lock.yml",
-      ".github/workflows/windows-grower.lock.yml"
+      ".github/workflows/daily-trajectory-grader-implementer.lock.yml",
+      ".github/workflows/design-decision-gate.lock.yml",
+      ".github/workflows/engine-conformance-atomic.lock.yml",
+      ".github/workflows/engine-conformance-crush.lock.yml",
+      ".github/workflows/engine-conformance-mini-swe-agent.lock.yml",
+      ".github/workflows/enterprise-docs-audit.lock.yml",
+      ".github/workflows/example-workflow-analyzer.lock.yml",
+      ".github/workflows/github-mcp-structural-analysis.lock.yml",
+      ".github/workflows/impeccable-skills-reviewer.lock.yml",
+      ".github/workflows/necromancer.lock.yml",
+      ".github/workflows/pr-sous-chef.lock.yml",
+      ".github/workflows/repo-tree-map.lock.yml",
+      ".github/workflows/schema-feature-coverage.lock.yml",
+      ".github/workflows/smoke-agent-public-approved.lock.yml",
+      ".github/workflows/smoke-claude-auto.lock.yml",
+      ".github/workflows/smoke-claude-sub-agents.lock.yml",
+      ".github/workflows/smoke-claude.lock.yml",
+      ".github/workflows/smoke-copilot-routed-steering.lock.yml",
+      ".github/workflows/smoke-issues.lock.yml",
+      ".github/workflows/smoke-otel-backends.lock.yml",
+      ".github/workflows/smoke-pi.lock.yml",
+      ".github/workflows/smoke-workflow-call.lock.yml",
+      ".github/workflows/spec-librarian.lock.yml",
+      ".github/workflows/squad-game-planner.lock.yml",
+      ".github/workflows/squad-implement-worker.lock.yml",
+      ".github/workflows/squad.lock.yml",
+      ".github/workflows/stale-repo-identifier.lock.yml",
+      ".github/workflows/static-analysis-report.lock.yml",
+      ".github/workflows/sub-issue-closer.lock.yml",
+      ".github/workflows/technical-doc-writer.lock.yml",
+      ".github/workflows/tidy.lock.yml",
+      ".github/workflows/visual-regression-checker.lock.yml",
+      ".github/workflows/weekly-safe-outputs-spec-review.lock.yml"
     ],
     "github/gh-aw-firewall": [
-      ".github/workflows/dependency-security-monitor.lock.yml",
-      ".github/workflows/firewall-issue-dispatcher.lock.yml"
+      ".github/workflows/build-test-network-isolation.lock.yml",
+      ".github/workflows/ci-doctor.lock.yml",
+      ".github/workflows/issue-duplication-detector.lock.yml",
+      ".github/workflows/pelis-agent-factory-advisor.lock.yml",
+      ".github/workflows/refactoring-scanner.lock.yml",
+      ".github/workflows/self-hosted-runner-doctor.lock.yml",
+      ".github/workflows/smoke-chroot.lock.yml",
+      ".github/workflows/smoke-copilot.lock.yml",
+      ".github/workflows/smoke-enclave-dynamic-issues-read.lock.yml",
+      ".github/workflows/smoke-playwright-runc.lock.yml"
     ],
     "github/gh-aw-mcpg": [
-      ".github/workflows/mcp-gateway-log-analyzer.lock.yml"
+      ".github/workflows/gpl-dependency-checker.lock.yml",
+      ".github/workflows/guard-status-tracker.lock.yml",
+      ".github/workflows/rust-guard-improver.lock.yml",
+      ".github/workflows/smoke-long-session.lock.yml",
+      ".github/workflows/smoke-safeoutputs-labels.lock.yml",
+      ".github/workflows/smoke-safeoutputs-reviews.lock.yml"
     ],
     "github/spec-kit": [
-      ".github/workflows/add-community-extension.lock.yml"
+      ".github/workflows/add-community-extension.lock.yml",
+      ".github/workflows/pr-assess.lock.yml"
     ],
     "githubnext/ado-aw": [
-      ".github/workflows/issue-triage.lock.yml"
+      ".github/workflows/docs-writer.lock.yml",
+      ".github/workflows/issue-triage.lock.yml",
+      ".github/workflows/risk.lock.yml",
+      ".github/workflows/update-awf-version.lock.yml"
+    ],
+    "githubnext/agentic-ops": [
+      ".github/workflows/agentic-token-audit.lock.yml"
     ],
     "githubnext/agentics": [
       ".github/workflows/link-checker.lock.yml"
     ],
     "githubnext/gh-aw-test": [
-      ".github/workflows/test-claude-create-discussion.lock.yml",
-      ".github/workflows/test-claude-mcp.lock.yml",
-      ".github/workflows/test-codex-add-comment.lock.yml",
-      ".github/workflows/test-codex-push-to-pull-request-branch.lock.yml",
+      ".github/workflows/test-claude-add-comment.lock.yml",
+      ".github/workflows/test-claude-nosandbox-create-issue.lock.yml",
+      ".github/workflows/test-claude-push-to-pull-request-branch.lock.yml",
+      ".github/workflows/test-claude-update-issue.lock.yml",
+      ".github/workflows/test-codex-command.lock.yml",
+      ".github/workflows/test-codex-create-discussion.lock.yml",
+      ".github/workflows/test-codex-create-pull-request-review-comment.lock.yml",
+      ".github/workflows/test-copilot-add-comment.lock.yml",
+      ".github/workflows/test-copilot-body-footer.lock.yml",
       ".github/workflows/test-copilot-close-discussion.lock.yml",
-      ".github/workflows/test-copilot-linear-create-issue.lock.yml",
-      ".github/workflows/test-copilot-nosandbox-create-repository-code-scanning-alert.lock.yml",
-      ".github/workflows/test-copilot-nosandbox-push-to-pull-request-branch.lock.yml",
-      ".github/workflows/test-copilot-restore-memory-custom-job.lock.yml"
+      ".github/workflows/test-copilot-close-issue-duplicate-of.lock.yml",
+      ".github/workflows/test-copilot-dismiss-pull-request-review.lock.yml",
+      ".github/workflows/test-copilot-inline-sub-agents.lock.yml",
+      ".github/workflows/test-copilot-jira-create-issue.lock.yml",
+      ".github/workflows/test-copilot-mcp-http-oidc-permission.lock.yml",
+      ".github/workflows/test-copilot-mcp-large-json-payload.lock.yml",
+      ".github/workflows/test-copilot-nosandbox-create-pull-request.lock.yml",
+      ".github/workflows/test-copilot-playwright-cli.lock.yml",
+      ".github/workflows/test-copilot-siderepo-create-pull-request-same-org.lock.yml",
+      ".github/workflows/test-copilot-siderepo-link-sub-issue.lock.yml",
+      ".github/workflows/test-copilot-siderepo-push-to-pull-request-branch-using-dispatch.lock.yml",
+      ".github/workflows/test-copilot-update-pull-request-replace-island.lock.yml"
     ],
     "githubnext/gh-aw-wizard": [
       ".github/workflows/accessibility-audit.lock.yml"
     ],
     "githubnext/gh-aw-workshop": [
       ".github/workflows/curriculum-evaluator.lock.yml",
+      ".github/workflows/q.lock.yml",
+      ".github/workflows/title-similarity-review.lock.yml",
       ".github/workflows/training-plan-research.lock.yml"
     ],
     "githubnext/gh-cao": [
       ".github/workflows/eu-cra-compliance-vulnerability-handling-auditor.lock.yml",
+      ".github/workflows/mattpocock-skills-reviewer.lock.yml",
       ".github/workflows/pr-reviewer.lock.yml",
-      ".github/workflows/self-care-dashboard-debug-logging.lock.yml",
-      ".github/workflows/self-care-server-soc2.lock.yml"
+      ".github/workflows/repo-assist-pr-upkeep.lock.yml",
+      ".github/workflows/self-care-agent-discoverability.lock.yml",
+      ".github/workflows/self-care-database-architecture.lock.yml",
+      ".github/workflows/self-care-server-go-logging.lock.yml",
+      ".github/workflows/software-development-practices.lock.yml"
     ],
     "githubnext/rig": [
       ".github/workflows/daily-rig-file-summarizer.lock.yml",
-      ".github/workflows/daily-rig-sampler.lock.yml"
+      ".github/workflows/daily-rig-sampler.lock.yml",
+      ".github/workflows/rig-skill-integration-gemini.lock.yml"
     ],
-    "githubnext/tsb": [
-      ".github/workflows/ci-doctor.lock.yml"
+    "githubnext/self-hosted-aw": [
+      ".github/workflows/azure-vm-openrouter.lock.yml"
+    ],
+    "gopaldp/demand-forecasting": [
+      ".github/workflows/update-docs-gemini.lock.yml"
+    ],
+    "gopaldp/devops-demo": [
+      ".github/workflows/update-docs-gemini.lock.yml"
+    ],
+    "gopaldp/distwi": [
+      ".github/workflows/update-docs-gemini.lock.yml"
+    ],
+    "gopaldp/ml-customer-analytics": [
+      ".github/workflows/update-docs-gemini.lock.yml"
+    ],
+    "gopaldp/nanoGPT": [
+      ".github/workflows/update-docs-gemini.lock.yml"
     ],
     "grahame-white/kicad_automation_2": [
       ".github/workflows/plan.lock.yml"
+    ],
+    "gumnut-ai/immich-adapter": [
+      ".github/workflows/maintainer.lock.yml"
+    ],
+    "hamedonassar95/Devobs": [
+      ".github/workflows/incident-investigator-vertex.lock.yml",
+      ".github/workflows/incident-investigator.lock.yml"
+    ],
+    "harmonie-joy/Luxe": [
+      ".github/workflows/luxe-bounded-repair.lock.yml"
+    ],
+    "harrywat/bubblescan": [
+      ".github/workflows/repo-assist.lock.yml"
     ],
     "harunraseed/agenticworkflowdemo_project": [
       ".github/workflows/feature-builder.lock.yml",
       ".github/workflows/issue-triage.lock.yml"
     ],
-    "home-assistant/android": [
-      ".github/workflows/e2e-triage.lock.yml"
+    "henryennis/mermaid-js-for-agents": [
+      ".github/workflows/mermaid-skill-maintenance.lock.yml"
+    ],
+    "hkppvictor8-hub/hermes-automation": [
+      ".github/workflows/daily-issue-triage.lock.yml"
+    ],
+    "holynakamoto/netpath": [
+      ".github/workflows/daily-activity-report.lock.yml"
     ],
     "hongymagic/q": [
+      ".github/workflows/performance-weekly.lock.yml",
       ".github/workflows/usability-weekly.lock.yml"
+    ],
+    "htekdev/gh-aw-overview": [
+      ".github/workflows/audit-workflows.lock.yml"
     ],
     "htekdev/vidpipe": [
       ".github/workflows/issue-triage.lock.yml",
       ".github/workflows/pr-triage.lock.yml"
     ],
+    "hy2219/medical-sdlc": [
+      ".github/workflows/daily-paper-recommendations.lock.yml"
+    ],
     "iamnbutler/motif": [
       ".github/workflows/repo-assist.lock.yml"
+    ],
+    "ibranibeny/contoso-order-desk": [
+      ".github/workflows/daily-activity-report.lock.yml"
+    ],
+    "imranmirzadubai-dot/aicq-assessment": [
+      ".github/workflows/aicq-autonomous-audit.lock.yml"
     ],
     "inference-sh/sdk-js": [
       ".github/workflows/code-review.lock.yml"
     ],
+    "intent-integrity-chain/kit": [
+      ".github/workflows/review-openai.lock.yml"
+    ],
     "irigoyen-fnet/kitten-agent-blog": [
       ".github/workflows/luna.lock.yml"
+    ],
+    "j0nathan-ll0yd/mantle-OfflineMediaDownloader": [
+      ".github/workflows/codegen-drift.lock.yml"
+    ],
+    "jacwu/demo-github-agentic-workflow": [
+      ".github/workflows/jd-generator-cn.lock.yml"
     ],
     "jadoont/agent-behavior-index": [
       ".github/workflows/abi-codex.lock.yml"
     ],
-    "jdubois/boot-ui": [
-      ".github/workflows/code-simplifier.lock.yml"
+    "jakeScorpio/awesome-copilot": [
+      ".github/workflows/advanced-copilot-cli-sync.lock.yml",
+      ".github/workflows/learning-hub-updater.lock.yml"
+    ],
+    "jamesmontemagno/tiny-clips": [
+      ".github/workflows/weekly-feature-parity.lock.yml"
+    ],
+    "jaspecla/RetirementCalculator": [
+      ".github/workflows/plan-ready-issue.lock.yml"
+    ],
+    "jburkhardt4/BKT-ai-apply": [
+      ".github/workflows/auto-rebase-merge.lock.yml"
     ],
     "jeffhandley/playlist-manager": [
       ".github/workflows/reconcile-apple-music.lock.yml"
@@ -651,11 +1243,26 @@
       ".github/workflows/estimador-de-issues.lock.yml",
       ".github/workflows/revisor-de-docs.lock.yml"
     ],
+    "jensen-yan/risc-v-simulator": [
+      ".github/workflows/daily-repo-status.lock.yml"
+    ],
     "jeroendesloovere/sitemap-bundle": [
       ".github/workflows/php-dependency-upgrade.lock.yml"
     ],
+    "jesch59/core": [
+      ".github/workflows/quality-scale-reviewer.lock.yml"
+    ],
+    "jezwhittaker/hacker-575": [
+      ".github/workflows/docs-upkeep.lock.yml"
+    ],
     "jgador/goblin": [
       ".github/workflows/documentation.lock.yml"
+    ],
+    "jiaysr/mzxyAutoScript": [
+      ".github/workflows/issue-handle-enhancement.lock.yml"
+    ],
+    "jojinixon/skills-agentic-workflows-that-read-the-room": [
+      ".github/workflows/update-github-info.lock.yml"
     ],
     "jonathanpeppers/dotnes": [
       ".github/workflows/dotnes-reviewer.lock.yml"
@@ -663,20 +1270,55 @@
     "josema-muniz-plain/skills-agentic-workflows-that-read-the-room": [
       ".github/workflows/update-github-info.lock.yml"
     ],
+    "joshjohanning-org/agents-and-agentic-workflows": [
+      ".github/workflows/doc-sync.lock.yml"
+    ],
     "jovadker/gemma3-4b-it-acagpuserverless": [
       ".github/workflows/daily-repo-status-report.lock.yml"
+    ],
+    "joy-son/260821-KHF": [
+      ".github/workflows/daily-paper-recommendations.lock.yml"
     ],
     "jpomfret/jpomfret.github.io": [
       ".github/workflows/daily-repo-status.lock.yml"
     ],
     "juan-campuzano/aw-design-patterns": [
-      ".github/workflows/monitoring-workflow-health.lock.yml"
+      ".github/workflows/monitoring-workflow-health.lock.yml",
+      ".github/workflows/trialops-issueops-triage.lock.yml"
+    ],
+    "juangcarmona/domusmind": [
+      ".github/workflows/lighthouse-sdlc-propose.lock.yml"
     ],
     "juangcarmona/lighthouse": [
-      ".github/workflows/lighthouse-sdlc-refine.lock.yml"
+      ".github/workflows/lighthouse-sdlc-apply-product-change.lock.yml",
+      ".github/workflows/lighthouse-sdlc-apply-review.lock.yml"
+    ],
+    "juangcarmona/lighthouse-published-consumer-20261104": [
+      ".github/workflows/lighthouse-sdlc-triage.lock.yml"
+    ],
+    "juangcarmona/lighthouse-serial-epic-20261105": [
+      ".github/workflows/lighthouse-sdlc-propose.lock.yml"
+    ],
+    "juangcarmona/presentations": [
+      ".github/workflows/lighthouse-sdlc-propose.lock.yml"
+    ],
+    "jukkakoskelin/nflcompanion": [
+      ".github/workflows/agentic-test.lock.yml"
+    ],
+    "juliamuiruri4/tailspin-toys": [
+      ".github/workflows/duplicate-review.lock.yml"
+    ],
+    "julietrajan/ghdemo": [
+      ".github/workflows/investigate-build-failure.lock.yml"
     ],
     "k0sproject/k0sctl": [
       ".github/workflows/smoke-triage.lock.yml"
+    ],
+    "kaito-tokyo/live-backgroundremoval-lite": [
+      ".github/workflows/validate-pr.lock.yml"
+    ],
+    "kanha-24/Airi": [
+      ".github/workflows/pr-triage.lock.yml"
     ],
     "kaovilai/k8s-cbt-s3mover-demo": [
       ".github/workflows/continuous-improvement.lock.yml"
@@ -698,23 +1340,63 @@
     ],
     "kaushal-waygood/agentic-self-healing-ci": [
       ".github/workflows/blog-auditor.lock.yml",
+      ".github/workflows/claude-code-user-docs-review.lock.yml",
+      ".github/workflows/code-scanning-fixer.lock.yml",
       ".github/workflows/daily-code-metrics.lock.yml",
       ".github/workflows/daily-doc-healer.lock.yml",
       ".github/workflows/daily-syntax-error-quality.lock.yml",
+      ".github/workflows/dev-hawk.lock.yml",
+      ".github/workflows/dev.lock.yml",
       ".github/workflows/discussion-task-miner.lock.yml",
       ".github/workflows/instructions-janitor.lock.yml",
+      ".github/workflows/issue-triage-agent.lock.yml",
+      ".github/workflows/metrics-collector.lock.yml",
       ".github/workflows/pr-nitpick-reviewer.lock.yml",
       ".github/workflows/repo-tree-map.lock.yml",
-      ".github/workflows/smoke-gemini.lock.yml"
+      ".github/workflows/smoke-copilot-arm.lock.yml",
+      ".github/workflows/smoke-gemini.lock.yml",
+      ".github/workflows/smoke-test-tools.lock.yml",
+      ".github/workflows/static-analysis-report.lock.yml",
+      ".github/workflows/technical-doc-writer.lock.yml",
+      ".github/workflows/test-create-pr-error-handling.lock.yml"
+    ],
+    "kbridgford-org/octocat_inventory": [
+      ".github/workflows/auto-analyze-failures.lock.yml"
     ],
     "kbrodecki/taskly-unit-test-agent": [
       ".github/workflows/unit-test-backfill.lock.yml"
     ],
+    "kojah/gohawk": [
+      ".github/workflows/hunt-slowdown.lock.yml"
+    ],
+    "korrino222/fluffy-eureka": [
+      ".github/workflows/issue-triage.lock.yml"
+    ],
+    "krkn-chaos/website": [
+      ".github/workflows/doc-sync.lock.yml"
+    ],
+    "kubecopilot/kubecopilot-core": [
+      ".github/workflows/docs-updater.lock.yml"
+    ],
+    "kubestellar/console": [
+      ".github/workflows/handle-complications.lock.yml.disabled"
+    ],
+    "kubestellar/docs": [
+      ".github/workflows/daily-team-status.lock.yml",
+      ".github/workflows/devstats.lock.yml"
+    ],
     "kymnguyen/spec-kit": [
       ".github/workflows/feature-assess.lock.yml"
     ],
+    "lakovmartin/skills-agentic-workflows-that-read-the-room": [
+      ".github/workflows/update-github-info.lock.yml"
+    ],
     "langfuse/langfuse": [
+      ".github/workflows/bedrock-model-api-formats.lock.yml",
       ".github/workflows/dependabot-security-maintainer.lock.yml"
+    ],
+    "letsauthlab/letsauth": [
+      ".github/workflows/scanner-review.lock.yml"
     ],
     "lfarci/my-agentic-workflows": [
       ".github/workflows/daily-report-status.lock.yml"
@@ -728,24 +1410,68 @@
     "lhuasheng/sample_project_1": [
       ".github/workflows/weekly-digest.lock.yml"
     ],
-    "licensee/licensee": [
-      ".github/workflows/repo-assist.lock.yml"
+    "libxengine/XEngine_APIService": [
+      ".github/workflows/auto-code.lock.yml",
+      ".github/workflows/issue-triage.lock.yml"
+    ],
+    "libxengine/XEngine_Authorize": [
+      ".github/workflows/auto-code.lock.yml",
+      ".github/workflows/issue-triage.lock.yml"
+    ],
+    "libxengine/XEngine_MQService": [
+      ".github/workflows/auto-code.lock.yml",
+      ".github/workflows/issue-triage.lock.yml"
+    ],
+    "libxengine/XEngine_ProxyServer": [
+      ".github/workflows/auto-code.lock.yml",
+      ".github/workflows/issue-triage.lock.yml"
+    ],
+    "libxengine/XEngine_ServiceApp": [
+      ".github/workflows/auto-code.lock.yml",
+      ".github/workflows/issue-triage.lock.yml"
     ],
     "lloydmckie-lang/github-agentic-workflows": [
-      ".github/workflows/daily-accessibility-review.lock.yml"
+      ".github/workflows/contribution-check.lock.yml",
+      ".github/workflows/daily-accessibility-review.lock.yml",
+      ".github/workflows/issue-triage.lock.yml"
+    ],
+    "loong64/openjdk-containers": [
+      ".github/workflows/dockerfile-readiness.lock.yml"
+    ],
+    "lorenzogirardi/fastapi-testapp": [
+      ".github/workflows/ai-issue-to-draft-pr.lock.yml",
+      ".github/workflows/ai-pr-review.lock.yml"
     ],
     "lucas-figueiredo-atona/Spec_Kit": [
-      ".github/workflows/add-community-extension.lock.yml"
+      ".github/workflows/add-community-extension.lock.yml",
+      ".github/workflows/add-community-preset.lock.yml",
+      ".github/workflows/bug-fix.lock.yml"
+    ],
+    "lukaszniedzielski/skills-agentic-workflows-that-read-the-room": [
+      ".github/workflows/update-github-info.lock.yml"
     ],
     "maceip/nvx": [
+      ".github/workflows/code-documentation.lock.yml",
       ".github/workflows/code-quality.lock.yml",
       ".github/workflows/code-reusability.lock.yml"
+    ],
+    "madflojo/testcerts": [
+      ".github/workflows/documentation-hunter-wrapper.lock.yml"
+    ],
+    "magicemptycity/OnmyojiAutoScript-custom": [
+      ".github/workflows/issue-handle-enhancement.lock.yml"
+    ],
+    "mahesh1112/Agentic-Workflows": [
+      ".github/workflows/ci-healer.lock.yml"
     ],
     "marrubio/agentic-workflow": [
       ".github/workflows/update-github-info.lock.yml"
     ],
     "martingci/QR_generador": [
       ".github/workflows/status-reporting.lock.yml"
+    ],
+    "martinsson/open-source-sanitizer": [
+      ".github/workflows/issue-to-merge.lock.yml"
     ],
     "mashhoodr/engineering-coach": [
       ".github/workflows/issue-triage.lock.yml"
@@ -754,7 +1480,11 @@
       ".github/workflows/ghaw-gql-control.lock.yml"
     ],
     "matsurigoto/agentic-workflow-demo": [
+      ".github/workflows/cost-tracker.lock.yml",
       ".github/workflows/daily-repo-status.lock.yml"
+    ],
+    "mattemmett/my-agentic-workflows": [
+      ".github/workflows/daily-report-status.lock.yml"
     ],
     "mattyatea/mattyatea-stacks": [
       ".github/workflows/dependency-updates-report.lock.yml"
@@ -765,55 +1495,96 @@
     "mdrizwanfk/skills.exercise.agentic-workflows-101": [
       ".github/workflows/update-github-info.lock.yml"
     ],
-    "microsoft/Microsoft-AI-Decision-Framework": [
-      ".github/workflows/link-checker.lock.yml"
+    "melabadi/diner-spaghetti": [
+      ".github/workflows/code-review.lock.yml"
     ],
-    "microsoft/agent-framework-go": [
-      ".github/workflows/dotnet-port-fixes-nightly.lock.yml"
+    "mgorczyca12/polonia-airlines": [
+      ".github/workflows/dependency-fix-tier2.lock.yml"
+    ],
+    "microsasa/cli-tools": [
+      ".github/workflows/feature-planner.lock.yml",
+      ".github/workflows/review-responder.lock.yml"
     ],
     "microsoft/agentrc": [
       ".github/workflows/ci-doctor.lock.yml",
       ".github/workflows/issue-triage.lock.yml"
     ],
     "microsoft/aspire": [
-      ".github/workflows/analyze-ci-failure.lock.yml"
+      ".github/workflows/milestone-changelog.lock.yml"
     ],
-    "microsoft/intelligent-terminal": [
-      ".github/workflows/ghaw-pr-accessibility.lock.yml"
+    "microsoft/frontier-ai-governance-rvas": [
+      ".github/workflows/issue-triage-agent.lock.yml"
+    ],
+    "microsoft/go-infra": [
+      ".github/workflows/dependency-audit-agent.lock.yml"
+    ],
+    "microsoft/security-devops-azdevops": [
+      ".github/workflows/msdo-issue-assistant.lock.yml"
     ],
     "microsoft/testfx": [
-      ".github/workflows/pipeline-test-triage.lock.yml"
+      ".github/workflows/add-tests.lock.yml",
+      ".github/workflows/address-review.agent.lock.yml",
+      ".github/workflows/dependabot-pr-bundler.lock.yml",
+      ".github/workflows/markdown-linter.lock.yml",
+      ".github/workflows/pipeline-test-triage.lock.yml",
+      ".github/workflows/resource-lock-refactoring.lock.yml",
+      ".github/workflows/review.agent.lock.yml"
     ],
-    "microsoft/typespec": [
-      ".github/workflows/bump-tcgc-csharp.lock.yml",
-      ".github/workflows/issue-triage.lock.yml"
+    "microsoft/vstest": [
+      ".github/workflows/malicious-code-scan.lock.yml",
+      ".github/workflows/markdown-linter.lock.yml"
     ],
-    "microsoft/winget-cli": [
-      ".github/workflows/issue-closure-recommendation.lock.yml"
+    "mighty-muffin/stoopid": [
+      ".github/workflows/concept-research.lock.yml"
     ],
-    "mitsuo119/innbuskcet-app": [
-      ".github/workflows/run-day2.lock.yml"
+    "miketsprague/super-basketball-league": [
+      ".github/workflows/repo-assist.lock.yml"
+    ],
+    "moaz76943-creator/-offline-packs-store": [
+      ".github/workflows/deutsch-pr-recovery.lock.yml"
+    ],
+    "mohamed-hossam1/spec-kit-mo": [
+      ".github/workflows/bug-test.lock.yml",
+      ".github/workflows/feature-assess.lock.yml"
     ],
     "monix/monix": [
       ".github/workflows/agent.lock.yml"
     ],
     "mono/SkiaSharp": [
-      ".github/workflows/auto-triage.lock.yml",
-      ".github/workflows/merge-message.lock.yml"
+      ".github/workflows/auto-skia-sync.lock.yml"
+    ],
+    "morganism/resourcemonitor": [
+      ".github/workflows/daily-repo-status.lock.yml"
     ],
     "mscott9160-web/ai-dlc-starter": [
       ".github/workflows/ai-dlc-release.lock.yml"
     ],
+    "msoutto-jha/gh-agentic-workflow": [
+      ".github/workflows/issue-triage.lock.yml"
+    ],
     "muaddibco/RealWorldProblems": [
       ".github/workflows/10-normalize.lock.yml",
       ".github/workflows/40-score.lock.yml",
+      ".github/workflows/55-ai-defensibility.lock.yml",
       ".github/workflows/58-scope-expansion-manual.lock.yml"
+    ],
+    "my-monalisa-org/cao-control": [
+      ".github/workflows/daily-repo-status.lock.yml"
     ],
     "my-monalisa-org/mona-metrics": [
       ".github/workflows/data-steward.lock.yml"
     ],
     "my-monalisa-org/octo-orbit": [
       ".github/workflows/mission-health.lock.yml"
+    ],
+    "n3rsti/nix-config": [
+      ".github/workflows/ci-doctor.lock.yml"
+    ],
+    "nchang90/agentic-devops-updates": [
+      ".github/workflows/github-copilot-update.lock.yml"
+    ],
+    "neubirdai/langfuse": [
+      ".github/workflows/dependabot-security-maintainer.lock.yml"
     ],
     "neverinfamous/db-mcp": [
       ".github/workflows/docs-drift-detector.lock.yml"
@@ -822,11 +1593,18 @@
       ".github/workflows/docs-drift-detector.lock.yml"
     ],
     "nicholasdbrady/foundry-docs": [
+      ".github/workflows/audit-file.lock.yml",
       ".github/workflows/docs-upstream-monitor.lock.yml"
     ],
     "nightowlhoothoot83-create/Raven-Sharp-QA-Agent": [
       ".github/workflows/raven-affiliate-scout.lock.yml",
       ".github/workflows/raven-site-guardian.lock.yml"
+    ],
+    "nikwebr/react-native-s3-bg-uploader": [
+      ".github/workflows/agent-serviceuser.lock.yml"
+    ],
+    "nissbran/azure-observability-samples": [
+      ".github/workflows/repo-maintenance-daily.lock.yml"
     ],
     "nitinjain999/platform-skills": [
       ".github/workflows/renovate-gate.lock.yml"
@@ -835,89 +1613,206 @@
       ".github/workflows/audit-workflows.lock.yml"
     ],
     "nmaarse/agenticworkflow": [
+      ".github/workflows/code-simplifier.lock.yml",
       ".github/workflows/weekly-report-status.lock.yml"
     ],
+    "nocarryr/lupy": [
+      ".github/workflows/daily-doc-updater.lock.yml"
+    ],
+    "nordseth/docker-images": [
+      ".github/workflows/tool-version-updates.lock.yml"
+    ],
     "norrietaylor/ch-oracles": [
+      ".github/workflows/chore-style-rust.lock.yml",
+      ".github/workflows/chore-style-toml.lock.yml",
+      ".github/workflows/trivial-dep-bump-python.lock.yml",
+      ".github/workflows/worker-fix.lock.yml",
       ".github/workflows/worker-iterate.lock.yml"
+    ],
+    "norschel-archive/AzKonstanz-2": [
+      ".github/workflows/dependabot-issue-bundler.lock.yml"
+    ],
+    "octobooth-demos/security-octo-supply-v4": [
+      ".github/workflows/auto-analyze-failures.lock.yml"
+    ],
+    "octodemo/hikari-legacy-support3": [
+      ".github/workflows/daily-repo-status.lock.yml"
     ],
     "ohcnetwork/care_fe": [
       ".github/workflows/care-review.lock.yml"
     ],
+    "olileger/agentic-t": [
+      ".github/workflows/product-refinement.lock.yml"
+    ],
     "open-feature/dotnet-sdk-contrib": [
       ".github/workflows/issue-triage.lock.yml"
     ],
-    "open-telemetry/opentelemetry-java-instrumentation": [
-      ".github/workflows/pr-review.lock.yml"
+    "opendiamonds/cloud-360": [
+      ".github/workflows/daily-digest.lock.yml"
     ],
     "pallavidineshkumar/skills-agentic-workflows-that-read-the-room1": [
       ".github/workflows/update-github-info.lock.yml"
     ],
-    "plengauer/BoomerCode": [
+    "pamontag-org-ghe/ai_models_lifecycle": [
+      ".github/workflows/phase-3-compatibility.lock.yml",
+      ".github/workflows/phase-7-cutover.lock.yml"
+    ],
+    "partnersdejoiy-hash/dejoiy-desk": [
+      ".github/workflows/issue-triage-agent.lock.yml"
+    ],
+    "pauldmurphy/memento-mori": [
+      ".github/workflows/squad-deps-worker.lock.yml",
+      ".github/workflows/squad-implement-worker.lock.yml"
+    ],
+    "pelsebubben/proispro": [
+      ".github/workflows/daily-repo-status.lock.yml"
+    ],
+    "pholleran-org/octocat_supply-orange-octo-invention": [
+      ".github/workflows/auto-analyze-failures.lock.yml"
+    ],
+    "plengauer/autopuppeteer": [
       ".github/workflows/autotriage.lock.yml"
+    ],
+    "pmalarme/python-agent-template": [
+      ".github/workflows/security-review.lock.yml"
     ],
     "pockebot/openpocket": [
       ".github/workflows/issue-fix.lock.yml",
       ".github/workflows/issue-plan.lock.yml"
     ],
-    "primer/css": [
+    "popey/grummage": [
+      ".github/workflows/repo-assist.lock.yml"
+    ],
+    "priyankvora257/Github-Pages": [
+      ".github/workflows/unbloat-docs.lock.yml"
+    ],
+    "prowler-cloud/prowler": [
       ".github/workflows/issue-triage.lock.yml"
+    ],
+    "pskoett/measuring-ai-proficiency": [
+      ".github/workflows/learning-aggregator-ci.lock.yml",
+      ".github/workflows/simplify-and-harden-ci.lock.yml",
+      ".github/workflows/spec-refiner.lock.yml"
     ],
     "ptarmiganlabs/butler": [
       ".github/workflows/grumpy-reviewer.lock.yml"
+    ],
+    "ptarmiganlabs/butler-sos": [
+      ".github/workflows/duplicate-code-detector.lock.yml"
     ],
     "pulumi-labs/gh-aw-internal": [
       ".github/workflows/gh-aw-pr-rereview.lock.yml"
     ],
     "pulumi/pulumi-kubernetes-operator": [
+      ".github/workflows/kubernetes-operator-pr-rereview.lock.yml",
       ".github/workflows/kubernetes-operator-pr-review.lock.yml"
     ],
     "pulumi/pulumi-tool-cdk2pulumi": [
       ".github/workflows/tool-cdk2pulumi-pr-review.lock.yml"
     ],
-    "py-why/dowhy": [
-      ".github/workflows/repo-assist.lock.yml"
-    ],
     "pycabbage/soundcloud-desktop": [
       ".github/workflows/dependabot-pr-reviewer.lock.yml"
     ],
-    "radinshayanfar/yuanrong-datasystem": [
-      ".github/workflows/review-security-agent.lock.yml"
+    "qifengdemoorg/demo-github-sdlc": [
+      ".github/workflows/bug-fixer.lock.yml"
     ],
-    "ragmha/gym": [
-      ".github/workflows/code-simplifier.lock.yml"
+    "quantumtechx360-sys/copi": [
+      ".github/workflows/resource-staleness-report.lock.yml"
+    ],
+    "r4kris/aboutme": [
+      ".github/workflows/agentic-wiki-writer.lock.yml"
+    ],
+    "radinshayanfar/yuanrong-datasystem": [
+      ".github/workflows/demo-review-correctness-agent.lock.yml",
+      ".github/workflows/mm-socratic-phase1-agent.lock.yml",
+      ".github/workflows/preflight-agent.lock.yml",
+      ".github/workflows/review-security-agent.lock.yml",
+      ".github/workflows/security-gather-agent.lock.yml"
     ],
     "rajata07/copilot-agent-and-mcp": [
       ".github/workflows/daily-repo-status.lock.yml"
     ],
-    "resq-software/pypi": [
-      ".github/workflows/auto-triage-issues.lock.yml"
+    "rajbos/Jarvis": [
+      ".github/workflows/gh-aw-version-check.yml"
+    ],
+    "rancher/rancher-ai-ui": [
+      ".github/workflows/e2e-automation-plan-verifier.lock.yml"
+    ],
+    "remix-run/react-router": [
+      ".github/workflows/aw-command-review-proposal.lock.yml",
+      ".github/workflows/aw-comment-router.lock.yml"
+    ],
+    "resq-software/dotnet": [
+      ".github/workflows/daily-secrets-analysis.lock.yml"
+    ],
+    "resq-software/viz": [
+      ".github/workflows/duplicate-code-detector.lock.yml"
     ],
     "review-bench/JacobPEvans_ansible-splunk": [
       ".github/workflows/ci-doctor.lock.yml"
+    ],
+    "review-bench/dotnet_android": [
+      ".github/workflows/android-reviewer.lock.yml"
     ],
     "review-bench/dotnet_sdk": [
       ".github/workflows/add-tactics-template-on-comment.lock.yml"
     ],
     "review-bench/github_copilot-sdk": [
-      ".github/workflows/handle-bug.lock.yml"
+      ".github/workflows/handle-bug.lock.yml",
+      ".github/workflows/handle-enhancement.lock.yml"
     ],
     "review-bench/github_gh-aw": [
       ".github/workflows/agent-persona-explorer.lock.yml",
       ".github/workflows/agentic-token-optimizer.lock.yml",
+      ".github/workflows/archie.lock.yml",
+      ".github/workflows/architecture-guardian.lock.yml",
+      ".github/workflows/artifacts-summary.lock.yml",
       ".github/workflows/auto-triage-issues.lock.yml",
+      ".github/workflows/blog-auditor.lock.yml",
       ".github/workflows/brave.lock.yml",
+      ".github/workflows/changeset.lock.yml",
       ".github/workflows/contribution-check.lock.yml",
+      ".github/workflows/copilot-agent-analysis.lock.yml",
+      ".github/workflows/daily-agent-of-the-day-blog-writer.lock.yml",
+      ".github/workflows/daily-aw-cross-repo-compile-check.md",
       ".github/workflows/daily-choice-test.lock.yml",
+      ".github/workflows/daily-code-metrics.lock.yml",
       ".github/workflows/daily-doc-updater.lock.yml",
+      ".github/workflows/daily-spdd-spec-planner.lock.yml",
+      ".github/workflows/daily-team-evolution-insights.lock.yml",
       ".github/workflows/daily-team-status.lock.yml",
+      ".github/workflows/dependabot-go-checker.lock.yml",
       ".github/workflows/poem-bot.lock.yml",
       ".github/workflows/pr-code-quality-reviewer.lock.yml",
       ".github/workflows/pr-description-caveman.lock.yml",
+      ".github/workflows/pr-sous-chef.lock.yml",
       ".github/workflows/refiner.lock.yml",
       ".github/workflows/smoke-codex.lock.yml",
+      ".github/workflows/smoke-multi-pr.lock.yml",
+      ".github/workflows/smoke-pi.lock.yml",
       ".github/workflows/spec-extractor.lock.yml",
       ".github/workflows/stale-pr-cleanup.lock.yml",
+      ".github/workflows/technical-doc-writer.lock.yml",
+      ".github/workflows/test-dispatcher.lock.yml",
       ".github/workflows/weekly-issue-summary.lock.yml"
+    ],
+    "ricardocovo/app-api": [
+      ".github/workflows/spec-this.lock.yml"
+    ],
+    "ricardocovo/focused-tube": [
+      ".github/workflows/test-gap-gate.lock.yml"
+    ],
+    "ricardocovo/focused-tube-demo": [
+      ".github/workflows/architecture-metadata-generator.lock.yml"
+    ],
+    "richardnoragon/C.L.E.A.R.---Governance": [
+      ".github/workflows/add-community-bundle.lock.yml"
+    ],
+    "richardw2021/skills-customize-your-github-copilot-experience": [
+      ".github/workflows/repo-status.lock.yml"
+    ],
+    "richgo/forge-kit-skills": [
+      ".github/workflows/forge-reference.lock.yml"
     ],
     "rick2200-dev/ec-test": [
       ".github/workflows/architect-review-security.lock.yml",
@@ -928,8 +1823,14 @@
     "rj010899-beep/Github_Action_Agentic_Workflow": [
       ".github/workflows/pr-review.lock.yml"
     ],
+    "rko26-tt-shiny-dollop/immersive-test-demo": [
+      ".github/workflows/auto-analyze-failures.lock.yml"
+    ],
     "rmax-ai/shardlake": [
       ".github/workflows/needs-human-mention.lock.yml"
+    ],
+    "rmstdope/retroquest": [
+      ".github/workflows/issue-enhancer.lock.yml"
     ],
     "rmwondolleck/go-github": [
       ".github/workflows/issue-worker-agent.lock.yml",
@@ -941,11 +1842,17 @@
     "robdcon/myapp": [
       ".github/workflows/repo-assist.lock.yml"
     ],
+    "robert-onyango/spec-kit-autopilot-demo2": [
+      ".github/workflows/speckit-implement.lock.yml"
+    ],
+    "rockcarver/frodo-cli": [
+      ".github/workflows/issue-worker.lock.yml"
+    ],
     "rohitsachan/skills-agentic-workflows-that-read-the-room": [
       ".github/workflows/update-github-info.lock.yml"
     ],
-    "rpdswtk/vsmqtt": [
-      ".github/workflows/combine-dependabot-prs.lock.yml"
+    "rshade/gh-aw-fleet": [
+      ".github/workflows/code-simplifier.lock.yml"
     ],
     "rsutter98/NdcApp": [
       ".github/workflows/update-docs.lock.yml"
@@ -953,34 +1860,47 @@
     "ruby-gtk-project/.github": [
       ".github/workflows/find-new-gtk-apps-gnome.lock.yml"
     ],
-    "runhey/OnmyojiAutoScript": [
-      ".github/workflows/issue-triage.lock.yml",
-      ".github/workflows/weekly-report.lock.yml"
+    "rysweet/azlin": [
+      ".github/workflows/documentation-freshness.lock.yml",
+      ".github/workflows/performance-monitor.lock.yml"
     ],
     "sabajamalian/day-1-a-mars": [
       ".github/workflows/ds-test-audit-pr.lock.yml"
     ],
     "sahad7793/agetic-sdlc-demo": [
+      ".github/workflows/l1-retro-loop.lock.yml",
       ".github/workflows/security-review.lock.yml"
     ],
+    "salvoj/copilot-cli-for-beginners": [
+      ".github/workflows/course-updater.lock.yml"
+    ],
+    "samelliottdlt/website": [
+      ".github/workflows/dependabot-audit.lock.yml"
+    ],
     "samuelkahessay/prd-to-prod": [
-      ".github/workflows/ci-doctor.lock.yml"
+      ".github/workflows/ci-doctor.lock.yml",
+      ".github/workflows/pipeline-status.lock.yml",
+      ".github/workflows/repo-assist.lock.yml"
     ],
     "samuelkahessay/prd-to-prod-template": [
       ".github/workflows/code-simplifier.lock.yml"
-    ],
-    "scaryrawr/scarypilot": [
-      ".github/workflows/autoresearch-sync.lock.yml"
     ],
     "schneutzi-81/schneutzi-81": [
       ".github/workflows/daily-repo-activity-summary.lock.yml"
     ],
     "scovetta/umpossible-libxml2": [
+      ".github/workflows/issue-comment-handler.lock.yml",
       ".github/workflows/perfbot.lock.yml",
       ".github/workflows/pm-orchestrator.lock.yml"
     ],
+    "seandorsett/gh-workflows": [
+      ".github/workflows/weekly-repository-maintainer.lock.yml"
+    ],
     "sebasPuentes/skills-agentic-workflows-that-read-the-room": [
       ".github/workflows/update-github-info.lock.yml"
+    ],
+    "seesharprun/example-code-repository": [
+      ".github/workflows/code-review-open.lock.yml"
     ],
     "sergey-tihon/Clippit": [
       ".github/workflows/clippy.lock.yml"
@@ -998,6 +1918,9 @@
       ".github/workflows/run-day5.lock.yml",
       ".github/workflows/scrum-events-worker-planning.lock.yml"
     ],
+    "sibest19/hass-meteoam": [
+      ".github/workflows/release-notes.lock.yml"
+    ],
     "sifiadlene/rssreader": [
       ".github/workflows/update-docs.lock.yml"
     ],
@@ -1005,28 +1928,49 @@
       ".github/workflows/issue-triage.lock.yml"
     ],
     "sjoerd2025/cli-docs": [
+      ".github/workflows/angular-migration.lock.yml",
+      ".github/workflows/contribution-guidelines-checker.lock.yml",
+      ".github/workflows/daily-accessibility-review.lock.yml",
       ".github/workflows/daily-doc-updater.lock.yml",
-      ".github/workflows/glossary-maintainer.lock.yml"
+      ".github/workflows/glossary-maintainer.lock.yml",
+      ".github/workflows/ng-update.lock.yml"
     ],
     "sjoerd2025/guardianshield-agents": [
       ".github/workflows/ci-coach.lock.yml",
+      ".github/workflows/contribution-guidelines-checker.lock.yml",
+      ".github/workflows/daily-perf-improver.lock.yml",
       ".github/workflows/daily-plan.lock.yml",
       ".github/workflows/weekly-research.lock.yml"
     ],
     "sjovic-test-org/agentic-sdlc-demo": [
       ".github/workflows/daily-repo-status.lock.yml"
     ],
-    "stbenjam/skillsaw": [
+    "snahashis-paul/agentic-workflow-t01": [
+      ".github/workflows/update-readme.lock.yml"
+    ],
+    "softchris/mlops-exercise": [
       ".github/workflows/issue-triage.lock.yml"
     ],
-    "stellar/rs-soroban-sdk": [
-      ".github/workflows/semver.lock.yml"
+    "spatialft/spatialft.github.io": [
+      ".github/workflows/claude-review.lock.yml"
+    ],
+    "srinitude/pi-until-done": [
+      ".github/workflows/issue-triage.lock.yml"
+    ],
+    "steimerbyte/obs-backgroundremoval-bgimage": [
+      ".github/workflows/validate-pr.lock.yml"
+    ],
+    "strawgate/agentic-workflows-public": [
+      ".github/workflows/architecture-guardian.lock.yml",
+      ".github/workflows/playwright-smoke-test.lock.yml",
+      ".github/workflows/test-coverage-detector.lock.yml"
     ],
     "streetartist/Alive": [
       ".github/workflows/pr-triage.lock.yml"
     ],
     "sujithq/quarkus": [
-      ".github/workflows/basic-agent.lock.yml"
+      ".github/workflows/basic-agent.lock.yml",
+      ".github/workflows/verify-model-pack.lock.yml"
     ],
     "sunstonesecure-robert/test-turtle-1": [
       ".github/workflows/build-template.lock.yml",
@@ -1049,13 +1993,36 @@
     "tegataiprime/Platelet-Movie": [
       ".github/workflows/weekly-status-report.lock.yml"
     ],
+    "teohsinyee/engineering-lab": [
+      ".github/workflows/daily-summary.lock.yml",
+      ".github/workflows/grumpy-reviewer.lock.yml"
+    ],
+    "thaw-app/Thaw": [
+      ".github/workflows/issue-triage.lock.yml"
+    ],
+    "thomast1906/github-agentic-workflows-terraform-upgrade": [
+      ".github/workflows/terraform-upgrade.lock.yml"
+    ],
+    "tiarebalbi/boleto.ts": [
+      ".github/workflows/code-quality-review.lock.yml"
+    ],
+    "tkubica12/pharmacy-agentic-loop-demo": [
+      ".github/workflows/maintenance.lock.yml"
+    ],
+    "tomoasleep/aiand-sandbox": [
+      ".github/workflows/ask-codex.lock.yml"
+    ],
     "tosin2013/mcp-adr-analysis-server": [
+      ".github/workflows/ai-executor-integration.lock.yml",
       ".github/workflows/ci-doctor.lock.yml",
       ".github/workflows/docs-site-validator.lock.yml",
       ".github/workflows/knowledge-graph-validation.lock.yml"
     ],
     "twikoojs/twikoo": [
       ".github/workflows/issue-triage.lock.yml"
+    ],
+    "unclebinary1001/spec-kit-autopilot-demo": [
+      ".github/workflows/speckit-implement.lock.yml"
     ],
     "unic/ai-developer-hub": [
       ".github/workflows/nighthawk.lock.yml"
@@ -1064,19 +2031,34 @@
       ".github/workflows/duplicates.lock.yml",
       ".github/workflows/review.lock.yml"
     ],
-    "vaadin/flow": [
-      ".github/workflows/diagram-bot.lock.yml",
-      ".github/workflows/doc-bot.lock.yml",
-      ".github/workflows/guidelines-bot.lock.yml"
+    "vasantwtw/agenticworkflowDemo": [
+      ".github/workflows/git-agentic-workflow_autolink_pbi.lock.yml"
     ],
     "verkyyi/agentfolio": [
       ".github/workflows/reviewer-agent.lock.yml"
     ],
     "verkyyi/github-agent-runner": [
+      ".github/workflows/daily-repo-status.lock.yml",
+      ".github/workflows/update-docs.lock.yml",
+      ".github/workflows/weekly-research.lock.yml"
+    ],
+    "vermegi/skills-expand-your-team-with-copilot-v3": [
+      ".github/workflows/daily-issues-report.lock.yml"
+    ],
+    "vibewatch/startupv0": [
       ".github/workflows/daily-repo-status.lock.yml"
+    ],
+    "vijayraavi/skills-agentic-workflows-that-read-the-room": [
+      ".github/workflows/update-github-info.lock.yml"
     ],
     "vinijmoura/dow-01": [
       ".github/workflows/workflow-docs-generator.lock.yml"
+    ],
+    "vivek0240/spec_kit_ivicky0240": [
+      ".github/workflows/add-community-bundle.lock.yml"
+    ],
+    "vivq22/skills-agentic-workflows-that-read-the-room-reactor": [
+      ".github/workflows/update-github-info.lock.yml"
     ],
     "vung-epam/vue-child-mfe-2": [
       ".github/workflows/daily-repo-status.lock.yml"
@@ -1093,7 +2075,18 @@
     "wangzhishou/OneBox": [
       ".github/workflows/issue-triage.lock.yml"
     ],
+    "webmaxru/enonic-agent-skills": [
+      ".github/workflows/skill-review-worker.lock.yml"
+    ],
+    "weiflycc-cmd/skills": [
+      ".github/workflows/markdown-linter.lock.yml"
+    ],
+    "wicksipedia/au-dev-events": [
+      ".github/workflows/discover-events.lock.yml"
+    ],
     "willvelida/biotrackr": [
+      ".github/workflows/breaking-change-checker.lock.yml",
+      ".github/workflows/code-review.lock.yml",
       ".github/workflows/dead-code-scan.lock.yml",
       ".github/workflows/sdd-compliance-checker.lock.yml"
     ],
@@ -1102,23 +2095,50 @@
     ],
     "ww-copilot-workshop/copilot-advanced-workshop": [
       ".github/workflows/ci-triage.lock.yml",
-      ".github/workflows/doku-drift.lock.yml"
+      ".github/workflows/doku-drift.lock.yml",
+      ".github/workflows/testluecken-report.lock.yml"
+    ],
+    "xingguangcuican6666/gitmip-cli": [
+      ".github/workflows/issue-triage.lock.yml"
+    ],
+    "yhor1e/aidd2": [
+      ".github/workflows/daily-repo-status.lock.yml"
+    ],
+    "yortch/agentic-devops-demo": [
+      ".github/workflows/chaos-engineering.lock.yml"
     ],
     "yuriemori/daily-tech-digest": [
       ".github/workflows/daily-tech-digest.lock.yml"
     ],
+    "yutkat/github-star-organizer": [
+      ".github/workflows/categorize-stars.lock.yml"
+    ],
     "yutkat/github-topic-organizer": [
       ".github/workflows/assign-topics.lock.yml"
     ],
+    "zerosaber10-dev/hve-innovation-fpt": [
+      ".github/workflows/issue-triage.lock.yml",
+      ".github/workflows/vex-draft.lock.yml"
+    ],
+    "zhongqingzhang45-tech/-": [
+      ".github/workflows/pr-triage.lock.yml"
+    ],
     "zircote/.github": [
       ".github/workflows/agent-health-monitor.lock.yml",
-      ".github/workflows/daily-standup.lock.yml"
+      ".github/workflows/daily-standup.lock.yml",
+      ".github/workflows/housekeeping-branches.lock.yml"
+    ],
+    "zircote/adrscope": [
+      ".github/workflows/ci-doctor.lock.yml",
+      ".github/workflows/issue-triage.lock.yml"
     ],
     "zircote/rlm-rs": [
-      ".github/workflows/ci-doctor.lock.yml"
+      ".github/workflows/ci-doctor.lock.yml",
+      ".github/workflows/daily-qa.lock.yml",
+      ".github/workflows/issue-triage.lock.yml"
     ],
-    "zwave-js/zwave-js": [
-      ".github/workflows/answer-from-docs.lock.yml"
+    "zopencommunity/meta": [
+      ".github/workflows/zopen-issue-plan.lock.yml"
     ],
     "zwave-js/zwave-js-ui": [
       ".github/workflows/answer-from-docs.lock.yml"

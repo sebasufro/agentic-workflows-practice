@@ -28,6 +28,8 @@ MANIFEST
 reports/
 issues/
 filtered_issues/
+repos.json
+analysis
 
 # PyInstaller
 #   Usually these files are written by a python script from a template

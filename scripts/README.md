@@ -1,6 +1,6 @@
 # Scripts de `gh-aw`
 
-Cuatro scripts separados:
+Cinco scripts separados:
 
 - [`repo_search_agentic.py`](repo_search_agentic.py): descubre repositorios que
   usan **GitHub Agentic Workflows** (`gh-aw`) y genera `repos.json`.
@@ -13,10 +13,13 @@ Cuatro scripts separados:
 - [`repo_filter_issues.py`](repo_filter_issues.py): filtra los CSV de issues
   anteriores para quedarse con los que están relacionados con `gh-aw`, usando
   título, descripción, etiquetas y referencias al pipeline de CI/CD.
+- [`repo_analyze_issues.py`](repo_analyze_issues.py): enriquece los issues
+  filtrados con datos de la API y los clasifica por origen (automático de
+  `gh-aw` o humano), tipo de problema, causa probable y forma de resolución.
 
-`repo_scan_actions.py`, `repo_fetch_issues.py` y `repo_filter_issues.py`
-reutilizan el cliente de GitHub y la carga de tokens de
-`repo_search_agentic.py`, por lo que los cuatro archivos deben estar en el mismo
+`repo_scan_actions.py`, `repo_fetch_issues.py`, `repo_filter_issues.py` y
+`repo_analyze_issues.py` reutilizan el cliente de GitHub y la carga de tokens de
+`repo_search_agentic.py`, por lo que los cinco archivos deben estar en el mismo
 directorio.
 
 ## Requisitos
@@ -29,9 +32,9 @@ directorio.
   ```
 
 - Un token de GitHub para la búsqueda de código. `repo_search_agentic.py` lo
-  necesita para la Code Search API; `repo_scan_actions.py` y
-  `repo_fetch_issues.py` lo usan para consultar repositorios, Actions e issues
-  con un límite mayor. `repo_filter_issues.py` solo lo necesita con
+  necesita para la Code Search API; `repo_scan_actions.py`, `repo_fetch_issues.py`
+  y `repo_analyze_issues.py` lo usan para consultar repositorios, Actions e
+  issues con un límite mayor. `repo_filter_issues.py` solo lo necesita con
   `--fetch-details`, para completar descripciones y etiquetas que falten en los
   CSV antiguos. Los scripts lo leen, en este orden:
   1. `--token`
@@ -301,6 +304,83 @@ suma `.github/workflows`, `github actions`, `workflow_dispatch`, `workflow run`,
 El CSV de salida conserva las columnas de entrada y agrega `coincidencias`, que
 indica qué palabra clave o etiqueta hizo coincidir cada issue. Si dos archivos
 de entrada contienen el mismo `link_issue`, se conserva una sola fila.
+
+### 6. Analizar los issues filtrados
+
+```bash
+# Analizar filtered_issues/agentic_issues.csv -> analysis/
+python scripts/repo_analyze_issues.py
+
+# Probar con los primeros 10 issues
+python scripts/repo_analyze_issues.py --limit 10
+
+# Incluir comentarios también en issues abiertos
+python scripts/repo_analyze_issues.py --comments all
+
+# Ignorar la caché y consultar todo de nuevo
+python scripts/repo_analyze_issues.py --refresh
+
+# Cambiar el directorio de salida y el paralelismo
+python scripts/repo_analyze_issues.py \
+  --out-dir analisis-2026-11 --workers 4
+```
+
+El script lee el CSV filtrado (por defecto
+`filtered_issues/agentic_issues.csv`), consulta cada issue en la API y escribe
+en `analysis/`:
+
+| Archivo | Contenido |
+|---|---|
+| `issues_enriched.csv` | Un issue por fila, con origen, categoría, causa, evidencia y resolución |
+| `summary.md` | Resumen general, tablas cruzadas, causas, ejemplos y comentarios de cierre |
+| `por_categoria.csv` | Agregado por categoría de problema |
+| `por_repositorio.csv` | Agregado por repositorio |
+| `por_flujo.csv` | Agregado por workflow agéntico |
+
+La caché de respuestas queda en `analysis/.cache/` (ignorada por git) para no
+repetir llamadas al volver a ejecutar. `--refresh` la ignora; `--comments`
+controla qué comentarios se consultan (`none`, `closed` o `all`).
+
+El CSV enriquecido agrega estas columnas a las del filtro:
+
+| Columna | Contenido |
+|---|---|
+| `numero_issue` | Número del issue en el repositorio |
+| `estado` / `motivo_estado` | `open`/`closed` y `state_reason` de GitHub |
+| `autor` / `tipo_autor` | Login y tipo (`User`, `Bot`, etc.) |
+| `origen` | `automatico_gh_aw`, `humano`, `bot_otro` o `desconocido` |
+| `flujo_trabajo` | Nombre del workflow agéntico extraído del cuerpo |
+| `naturaleza` | `fallo_tecnico`, `limite_operativo`, `configuracion`, `bloqueo_seguridad`, `seguimiento`, `prueba`, `mejora` u `otro` |
+| `categoria` | Categoría principal del problema |
+| `categorias_secundarias` | Otras señales detectadas en el mismo issue |
+| `causa_probable` | Explicación de la causa, con datos del cuerpo cuando están disponibles |
+| `evidencia` | Fragmento textual que respalda la clasificación |
+| `resolucion` | `abierto`, `cerrado_por_desarrollador`, `cerrado_por_autor`, `cerrado_automaticamente`, `descartado`, `duplicado` o `cerrado_sin_cerrador` |
+| `cerrado_por` / `tipo_cerrador` | Quién cerró el issue y si es usuario o bot |
+| `creado_en` / `cerrado_en` / `dias_abierto` | Fechas y duración |
+| `expiracion` / `expirado` | Fecha `gh-aw-expires` del cuerpo y si ya venció |
+| `comentarios` / `comentarios_humanos` | Cantidad total y de comentarios humanos |
+| `etiquetas` | Labels separadas por `;` |
+| `ultimo_comentario` / `autor_ultimo_comentario` | Último comentario humano (o el último disponible) y su autor |
+| `coincidencias` | Motivo por el que el filtro incluyó el issue |
+
+Categorías principales que reconoce:
+
+- Fallos técnicos: `fallo_workflow`, `jobs_fallidos`, `fallo_engine`,
+  `sin_safe_outputs`, `safe_output_fallido`, `datos_faltantes`,
+  `herramientas_faltantes`, `resultado_incompleto`, `fallo_repo_memory`,
+  `fallo_skill`, `lock_file_desactualizado`.
+- Límites operativos: `presupuesto_ia`, `rate_limit`, `timeout_agente`.
+- Configuración y seguridad: `fallo_modelo`, `fallo_secretos`,
+  `archivos_protegidos`.
+- Seguimiento: `seguimiento_no_op`, `seguimiento_deteccion`.
+- Origen humano: `prueba_manual`, `solicitud_mejora`.
+
+La clasificación es heurística: busca las señales que `gh-aw` escribe en el
+cuerpo (`No Safe Outputs Generated`, `Missing Data Reported`,
+`Lock File Out of Sync`, `Engine Failure`, etc.) y, si no encuentra ninguna,
+usa el título y las etiquetas. La columna `evidencia` permite auditar cada
+decisión; los casos con categoría `otro` conviene revisarlos a mano.
 
 ## Qué contiene el reporte
 
