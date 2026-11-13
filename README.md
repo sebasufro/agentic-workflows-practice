@@ -7,12 +7,14 @@ Herramientas para estudiar el uso de GitHub Agentic Workflows (`gh-aw`):
 - [`scripts/repo_scan_actions.py`](scripts/repo_scan_actions.py): empareja
   `.md` ↔ `.lock.yml` y genera reportes Markdown de ejecuciones.
   Ver [instrucciones](scripts/README.md).
-- [`scripts/repo_fetch_issues.py`](scripts/repo_fetch_issues.py): exporta los
-  issues de uno o varios repositorios (`repos.json`, `--repo`, filtros) a un
-  CSV combinado o a un CSV por repositorio en `issues/`.
+- [`scripts/repo_fetch_issues.py`](scripts/repo_fetch_issues.py): descarga los
+  issues de uno o varios repositorios (`repos.json`, `--repo`, filtros) en
+  bruto, página por página, y genera un JSON por issue y un CSV dentro de
+  `issues/{dueño}__{repo}/`. Opcionalmente escribe un CSV combinado.
 - [`scripts/repo_filter_issues.py`](scripts/repo_filter_issues.py): filtra los
-  CSV de `issues/` y genera `filtered_issues/agentic_issues.csv` con los issues
-  relacionados con `gh-aw`, según título, descripción, etiquetas y CI/CD.
+  JSON individuales de `issues/` (y opcionalmente los CSV históricos) y genera
+  `filtered_issues/agentic_issues.csv` con los issues relacionados con `gh-aw`,
+  según título, descripción, etiquetas y CI/CD, sin consultar la API.
   Ver [instrucciones](scripts/README.md).
 - [`scripts/repo_analyze_issues.py`](scripts/repo_analyze_issues.py): clasifica
   los issues filtrados por origen (automático de `gh-aw` o humano), tipo de
@@ -25,15 +27,17 @@ Herramientas para estudiar el uso de GitHub Agentic Workflows (`gh-aw`):
 python scripts/repo_search_agentic.py discover --out repos.json
 python scripts/repo_scan_actions.py repo PowerShell/vscode-powershell --runs 100
 
-# Exportar todos los issues de repos.json a un único CSV
+# Descargar todos los issues de repos.json, una carpeta por repositorio
 python scripts/repo_fetch_issues.py --repos-file repos.json
 
-# O solamente un repositorio / una cantidad limitada:
-# se genera un CSV por repositorio dentro de issues/
+# O solamente un repositorio / una cantidad limitada
 python scripts/repo_fetch_issues.py --repo PowerShell/vscode-powershell
 python scripts/repo_fetch_issues.py --repos-file repos.json --limit 10
 
-# Filtrar los CSV de issues/ y generar filtered_issues/agentic_issues.csv
+# Regenerar JSON individuales y CSV desde las páginas crudas ya guardadas
+python scripts/repo_fetch_issues.py --parse-only
+
+# Filtrar los JSON de issues/ y generar filtered_issues/agentic_issues.csv
 python scripts/repo_filter_issues.py
 
 # Analizar los issues filtrados y generar reportes en analysis/

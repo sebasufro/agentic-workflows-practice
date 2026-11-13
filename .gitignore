@@ -27,6 +27,7 @@ share/python-wheels/
 MANIFEST
 reports/
 issues/
+issues-json/
 filtered_issues/
 repos.json
 analysis
