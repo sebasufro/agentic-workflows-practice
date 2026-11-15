@@ -8,13 +8,11 @@ Cinco scripts separados:
   repositorios, empareja sus archivos `.md` con los `.lock.yml` y genera
   reportes Markdown con las últimas ejecuciones de GitHub Actions.
 - [`repo_fetch_issues.py`](repo_fetch_issues.py): descarga todos los issues de
-  los repositorios en bruto, página por página, y genera un JSON por issue y un
-  CSV dentro de `issues/{dueño}__{repo}/`. Con `--with-details` agrega también
-  descripción y etiquetas al CSV; `--parse-only` regenera las salidas desde los
-  crudos sin llamar a la API.
-- [`repo_filter_issues.py`](repo_filter_issues.py): filtra los `issue_*.json`
-  de `issues/` (y opcionalmente los CSV históricos) para quedarse con los que
-  están relacionados con `gh-aw`, usando título, descripción, etiquetas y
+  los repositorios en bruto, página por página, y guarda únicamente la respuesta
+  cruda en `issues/{dueño}__{repo}/raw/`. No genera CSV ni JSON individuales.
+- [`repo_filter_issues.py`](repo_filter_issues.py): lee las páginas crudas,
+  separa cada issue en `issue_{número}.json` dentro de su repositorio y filtra
+  los relacionados con `gh-aw` usando título, descripción, etiquetas y
   referencias al pipeline de CI/CD, sin consultar la API.
 - [`repo_analyze_issues.py`](repo_analyze_issues.py): enriquece los issues
   filtrados con datos de la API y los clasifica por origen (automático de
@@ -206,22 +204,6 @@ python scripts/repo_fetch_issues.py \
   --repos-file repos.json --org PowerShell \
   --exclude PowerShell/vscode-powershell
 
-# Incluir descripción y etiquetas en el CSV (útil si se filtra en modo CSV)
-python scripts/repo_fetch_issues.py \
-  --repo PowerShell/vscode-powershell --with-details
-
-# Regenerar JSON individuales, CSV y metadata sin llamar a la API
-python scripts/repo_fetch_issues.py --parse-only
-
-# Regenerar solo un repositorio desde sus páginas crudas
-python scripts/repo_fetch_issues.py --parse-only \
-  --repo PowerShell/vscode-powershell
-
-# Además de las carpetas, escribir un CSV combinado
-python scripts/repo_fetch_issues.py \
-  --repos-file repos.json --limit 10 \
-  --combined --out issues-10.csv
-
 # Cambiar la carpeta base de salida
 python scripts/repo_fetch_issues.py \
   --repo PowerShell/vscode-powershell --issues-dir /tmp/issues
@@ -242,76 +224,49 @@ nombre `{dueño}__{repo}`:
 ```text
 issues/
 └── PowerShell__vscode-powershell/
-    ├── raw/
-    │   ├── page_0001.json
-    │   └── page_0002.json
-    ├── issue_123.json
-    ├── issue_124.json
-    ├── vscode-powershell_issues.csv
-    └── metadata.json
+    └── raw/
+        ├── page_0001.json
+        └── page_0002.json
 ```
+
+`repo_fetch_issues.py` solo escribe `raw/`:
 
 | Archivo | Contenido |
 |---|---|
 | `raw/page_NNNN.json` | Respuesta cruda de cada página de la API, tal como la devuelve GitHub |
-| `issue_{número}.json` | Un issue individual, sin pull requests |
-| `{repo}_issues.csv` | Lista de issues con el esquema de la tabla siguiente |
-| `metadata.json` | Fecha de descarga, páginas, cantidades, PRs descartados y si la descarga quedó completa |
 
 Los archivos crudos conservan también los pull requests, porque son la respuesta
-original de GitHub. Al generar los JSON individuales y el CSV se descartan los
-pull requests.
+original de GitHub. El parseo, la creación de los `issue_{número}.json` y el
+descarte de pull requests los hace `repo_filter_issues.py`.
 
 El script consulta `GET /repos/{owner}/{repo}/issues?state=all` y recorre todas
-las páginas. Cada CSV tiene estas columnas:
-
-| Columna | Contenido |
-|---|---|
-| `nombre_repositorio` | Nombre del repositorio, sin el dueño |
-| `dueño_repositorio` | Organización o usuario dueño del repositorio |
-| `titulo` | Título del issue |
-| `salida` | Estado actual del issue: `open` o `closed` |
-| `link_issue` | URL pública directa al issue (`html_url`), no la URL de la API |
-
-Con `--with-details` se agregan `descripcion` (cuerpo del issue) y `etiquetas`
-(labels separadas por `;`) después de `titulo`. Esas columnas permiten que
-`repo_filter_issues.py` busque en el cuerpo y en los labels usando solo el CSV.
-De todos modos, el filtro usa por defecto los `issue_*.json`, que ya contienen
-toda la información, así que un CSV generado sin `--with-details` solo se
-filtrará por título cuando no haya JSON disponibles.
+las páginas siguiendo los headers `Link`.
 
 Si un repositorio no tiene issues o los tiene deshabilitados, se informa durante
 el progreso y el resto continúa. `--max-pages N` permite limitar las páginas de
-100 issues por repositorio; `0` (por defecto) significa sin límite y la descarga
-se marca como parcial en `metadata.json` cuando se corta antes del final. Esa
-carpeta queda reemplazada por el subconjunto descargado, así que conviene usar
-`--max-pages` solo para pruebas o en una carpeta nueva.
+100 issues por repositorio; `0` (por defecto) significa sin límite.
 
-La carpeta de cada repositorio se actualiza de forma segura: las páginas nuevas
-se descargan en una carpeta temporal y solo reemplazan a las anteriores si la
-descarga termina bien. Después se eliminan los `issue_*.json` que ya no existen
-y se regeneran el CSV y `metadata.json`, de modo que no queden datos obsoletos.
-
-`--parse-only` hace ese último paso sin llamar a la API: lee `raw/*.json`,
-reescribe los JSON individuales y el CSV, y actualiza `metadata.json`. Sin
-`--repo` ni `--repos-file`, recorre todas las carpetas de `issues/` que tengan
-`raw/`. Si querés conservar `descripcion` y `etiquetas` en el CSV, pasá también
-`--with-details`. `--combined` agrega un CSV combinado en `--out` además de las
-carpetas por repositorio; `--issues-dir` cambia la carpeta base de salida.
+La carpeta `raw/` de cada repositorio se actualiza de forma segura: las páginas
+nuevas se descargan en una carpeta temporal y solo reemplazan a las anteriores
+si la descarga termina bien. Los JSON individuales de `repo_filter_issues.py` se
+regeneran después a partir de esas páginas.
 
 La paginación sigue los headers `Link` de GitHub. En repositorios con muchísimos
 issues, GitHub usa paginación por cursor (`after`/`before`) y rechaza `page` a
 partir de la página 100; el script detecta ese caso y continúa solo con el
 cursor.
 
-### 5. Filtrar issues relacionados con `gh-aw`
+### 5. Separar y filtrar issues relacionados con `gh-aw`
 
 ```bash
-# Leer los issue_*.json de issues/ y escribir
+# Leer raw/page_*.json, escribir issue_*.json por repositorio y generar
 # filtered_issues/agentic_issues.csv (sin llamar a la API)
 python scripts/repo_filter_issues.py
 
-# Usar solo los JSON individuales (más preciso)
+# Usar solo las páginas crudas
+python scripts/repo_filter_issues.py --source raw
+
+# Usar solo los JSON individuales ya separados
 python scripts/repo_filter_issues.py --source json
 
 # Usar solo los CSV históricos
@@ -325,27 +280,42 @@ python scripts/repo_filter_issues.py \
   --keyword "safe-outputs" --keyword "agentic" \
   --label "github-actions"
 
-# Leer un issue JSON concreto y escribir en otra ruta
+# Leer una página cruda o un issue concreto y escribir en otra ruta
 python scripts/repo_filter_issues.py \
-  --input issues/0GiS0__0gis0/issue_41.json \
-  --out /tmp/0gis0_agentic.csv
+  --input issues/0GiS0__0gis0/raw/page_0001.json \
+  --source raw --out /tmp/0gis0_agentic.csv
 ```
+
+`repo_filter_issues.py` completa el trabajo de `repo_fetch_issues.py`: lee las
+páginas de `raw/`, descarta pull requests, deduplica por número de issue y escribe
+un `issue_{número}.json` por issue en la carpeta del repositorio:
+
+```text
+issues/PowerShell__vscode-powershell/
+├── raw/
+│   ├── page_0001.json
+│   └── page_0002.json
+├── issue_123.json
+└── issue_124.json
+```
+
+Si se procesan todas las páginas de un repositorio sin errores, se eliminan los
+`issue_*.json` que ya no correspondan a ningún issue. Si solo se procesa un
+subconjunto (por ejemplo, una página concreta), los JSON existentes se conservan.
 
 La salida por defecto es `filtered_issues/agentic_issues.csv`, en su propia
 carpeta, para no mezclarla con los datos originales de `issues/`. Se puede
 cambiar con `--out`.
 
-El filtro usa por defecto `--source auto`: procesa primero los `issue_*.json`
-de `issues/{dueño}__{repo}/` y después los CSV históricos que hayan quedado de
-ejecuciones anteriores. Como los JSON ya traen el cuerpo y las etiquetas
-completas, el filtrado es más preciso y no consulta la API. Si un issue aparece
-en más de un archivo, se conserva una sola fila por `link_issue`, priorizando la
-que tenga más datos.
+El filtro usa por defecto `--source auto`: procesa primero las páginas crudas,
+después los `issue_*.json` de repositorios sin `raw/` y por último los CSV
+históricos. Como los datos locales ya traen el cuerpo y las etiquetas completas,
+el filtrado es más preciso y no consulta la API. Si un issue aparece en más de un
+archivo, se conserva una sola fila por `link_issue`, priorizando la que tenga más
+datos.
 
-`--source json` lee solo los JSON individuales; `--source csv` lee solo los CSV
-históricos. Al indicar un archivo concreto con `--input`, también se puede
-apuntar a una página cruda (`raw/page_0001.json`), de la que se descartan los
-pull requests automáticamente.
+`--source raw` lee solo `raw/page_*.json`; `--source json` lee solo los JSON
+individuales; `--source csv` lee solo los CSV históricos.
 
 El filtro busca, sin distinguir mayúsculas/minúsculas, en `titulo`,
 `descripcion` y `etiquetas`. Por defecto reconoce señales como `gh-aw`,

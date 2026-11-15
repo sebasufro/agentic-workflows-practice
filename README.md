@@ -9,10 +9,10 @@ Herramientas para estudiar el uso de GitHub Agentic Workflows (`gh-aw`):
   Ver [instrucciones](scripts/README.md).
 - [`scripts/repo_fetch_issues.py`](scripts/repo_fetch_issues.py): descarga los
   issues de uno o varios repositorios (`repos.json`, `--repo`, filtros) en
-  bruto, página por página, y genera un JSON por issue y un CSV dentro de
-  `issues/{dueño}__{repo}/`. Opcionalmente escribe un CSV combinado.
-- [`scripts/repo_filter_issues.py`](scripts/repo_filter_issues.py): filtra los
-  JSON individuales de `issues/` (y opcionalmente los CSV históricos) y genera
+  bruto, página por página, y guarda solo las respuestas crudas en
+  `issues/{dueño}__{repo}/raw/`.
+- [`scripts/repo_filter_issues.py`](scripts/repo_filter_issues.py): separa los
+  issues de las páginas crudas en `issue_{número}.json` por repositorio y genera
   `filtered_issues/agentic_issues.csv` con los issues relacionados con `gh-aw`,
   según título, descripción, etiquetas y CI/CD, sin consultar la API.
   Ver [instrucciones](scripts/README.md).
@@ -34,10 +34,7 @@ python scripts/repo_fetch_issues.py --repos-file repos.json
 python scripts/repo_fetch_issues.py --repo PowerShell/vscode-powershell
 python scripts/repo_fetch_issues.py --repos-file repos.json --limit 10
 
-# Regenerar JSON individuales y CSV desde las páginas crudas ya guardadas
-python scripts/repo_fetch_issues.py --parse-only
-
-# Filtrar los JSON de issues/ y generar filtered_issues/agentic_issues.csv
+# Separar los issues de raw/ en JSON individuales y filtrarlos
 python scripts/repo_filter_issues.py
 
 # Analizar los issues filtrados y generar reportes en analysis/

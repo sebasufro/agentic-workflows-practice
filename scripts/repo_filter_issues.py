@@ -1,10 +1,20 @@
 #!/usr/bin/env python3
 """
-repo_filter_issues.py — Filtra issues relacionados con GitHub Agentic Workflows.
+repo_filter_issues.py — Separa los issues y filtra los de GitHub Agentic Workflows.
 
-Lee los JSON individuales `issue_*.json` que genera `repo_fetch_issues.py`
-dentro de `issues/` y busca señales de la herramienta en el título, la
-descripción y las etiquetas del issue:
+Lee las páginas crudas `raw/page_*.json` que genera `repo_fetch_issues.py`,
+extrae cada issue (descartando pull requests) y guarda un JSON individual
+`issue_{número}.json` en la carpeta de su repositorio:
+
+    issues/{dueño}__{repo}/
+    ├── raw/
+    │   ├── page_0001.json
+    │   └── page_0002.json
+    ├── issue_123.json
+    └── issue_124.json
+
+Además, busca señales de `gh-aw` en el título, la descripción y las etiquetas
+de cada issue:
 
 - Palabras clave como `gh-aw`, `agentic workflow`, `[aw]`, `.lock.yml` o
   `safe outputs`.
@@ -12,20 +22,20 @@ descripción y las etiquetas del issue:
 - Opcionalmente, términos de CI/CD como `.github/workflows`, `workflow_dispatch`
   o `pipeline`.
 
-Como los JSON ya contienen el cuerpo y las etiquetas del issue, el filtro no
-necesita consultar la API. También puede leer los CSV históricos de `issues/`;
-en modo `auto` usa primero los JSON y completa con los CSV, conservando una sola
-fila por `link_issue`.
-
 El resultado es un CSV combinado en `filtered_issues/agentic_issues.csv` con las
 filas que coinciden y una columna `coincidencias` que indica por qué se incluyó
-cada issue. Así no se mezcla con los datos originales de `issues/`.
+cada issue. Todo se hace con datos locales: no se consulta la API.
+
+También puede leer los `issue_*.json` ya existentes (`--source json`) o los CSV
+históricos (`--source csv`). En modo `auto` usa primero las páginas crudas,
+después los JSON y por último los CSV, conservando una sola fila por issue.
 
 Ejemplos:
 
     python scripts/repo_filter_issues.py
     python scripts/repo_filter_issues.py --include-pipeline
     python scripts/repo_filter_issues.py --keyword "gh-aw" --keyword "agentic"
+    python scripts/repo_filter_issues.py --source raw
     python scripts/repo_filter_issues.py --source json
     python scripts/repo_filter_issues.py --source csv
 """
@@ -37,6 +47,7 @@ import csv
 import json
 import os
 import re
+import shutil
 import sys
 from pathlib import Path
 from typing import Any, Iterator
@@ -45,6 +56,7 @@ PROJECT_ROOT = Path(__file__).resolve().parent.parent
 DEFAULT_INPUT_DIR = PROJECT_ROOT / "issues"
 DEFAULT_OUTPUT_DIR = PROJECT_ROOT / "filtered_issues"
 DEFAULT_OUTPUT = DEFAULT_OUTPUT_DIR / "agentic_issues.csv"
+RAW_DIR_NAME = "raw"
 
 DEFAULT_KEYWORDS = (
     "gh-aw",
@@ -93,8 +105,8 @@ def input_files(
     path: Path,
     output: Path,
     source: str,
-) -> tuple[list[Path], list[Path]]:
-    """Devuelve (JSON individuales, CSV) según la fuente pedida."""
+) -> tuple[list[Path], list[Path], list[Path]]:
+    """Devuelve (páginas crudas, JSON individuales, CSV) según la fuente."""
     if not path.exists():
         raise FileNotFoundError(f"No existe la ruta de entrada: {path}")
 
@@ -102,17 +114,36 @@ def input_files(
 
     if path.is_file():
         suffix = path.suffix.lower()
-        if suffix == ".json" and source in {"auto", "json"}:
-            return [path], []
-        if suffix == ".csv" and source in {"auto", "csv"}:
-            return [], [path]
+        if suffix == ".csv":
+            if source not in {"auto", "csv"}:
+                raise ValueError(
+                    f"El archivo {path} no coincide con --source {source}."
+                )
+            return [], [], [path]
+        if suffix == ".json":
+            if source == "raw":
+                return [path], [], []
+            if source == "json":
+                return [], [path], []
+            if source == "auto":
+                if path.name.startswith("page_"):
+                    return [path], [], []
+                return [], [path], []
+            raise ValueError(f"El archivo {path} no coincide con --source {source}.")
         raise ValueError(
-            f"El archivo {path} no coincide con --source {source} "
-            "(se esperaba .json o .csv)."
+            f"Extensión no soportada en {path}: se esperaba .json o .csv."
         )
 
+    raw_files: list[Path] = []
     json_files: list[Path] = []
     csv_files: list[Path] = []
+
+    if source in {"auto", "raw"}:
+        raw_files = [
+            file
+            for file in sorted(path.rglob("page_*.json"))
+            if file.parent.name == RAW_DIR_NAME and file.resolve() != output_resolved
+        ]
     if source in {"auto", "json"}:
         json_files = [
             file
@@ -125,7 +156,8 @@ def input_files(
             for file in sorted(path.rglob("*.csv"))
             if file.resolve() != output_resolved
         ]
-    return json_files, csv_files
+
+    return raw_files, json_files, csv_files
 
 
 def split_terms(values: list[str] | None) -> list[str]:
@@ -218,6 +250,33 @@ def load_json_issues(path: Path) -> list[dict[str, Any]]:
     ]
 
 
+def issues_from_raw_pages(files: list[Path]) -> tuple[list[dict[str, Any]], int]:
+    """Extrae y deduplica los issues de varias páginas crudas.
+
+    Devuelve (issues, cantidad de archivos con error de lectura).
+    """
+    by_number: dict[Any, dict[str, Any]] = {}
+    order: list[Any] = []
+    errors = 0
+
+    for file in sorted(files):
+        try:
+            issues = load_json_issues(file)
+        except (OSError, json.JSONDecodeError) as exc:
+            print(f"  aviso: no se pudo leer {display_path(file)}: {exc}", file=sys.stderr)
+            errors += 1
+            continue
+
+        for issue in issues:
+            number = issue.get("number")
+            key: Any = number if number is not None else f"sin-numero-{len(order)}"
+            if key not in by_number:
+                order.append(key)
+            by_number[key] = issue
+
+    return [by_number[key] for key in order], errors
+
+
 def repository_directory(path: Path) -> Path:
     """Encuentra la carpeta del repositorio desde un issue o una página cruda."""
     for directory in path.parents:
@@ -226,6 +285,71 @@ def repository_directory(path: Path) -> Path:
         if "__" in directory.name:
             return directory
     return path.parent
+
+
+def write_json_file(path: Path, data: Any) -> None:
+    """Escribe JSON de forma atómica para no dejar archivos a medio escribir."""
+    temp_path = path.with_name(path.name + ".tmp")
+    with temp_path.open("w", encoding="utf-8") as handle:
+        json.dump(data, handle, ensure_ascii=False, indent=2)
+        handle.write("\n")
+    os.replace(temp_path, path)
+
+
+def write_individual_issues(
+    repo_dir: Path,
+    issues: list[dict[str, Any]],
+    *,
+    cleanup: bool,
+    verbose: bool,
+) -> int:
+    """Escribe issue_{número}.json y elimina los obsoletos si cleanup es True."""
+    staging_dir = repo_dir / ".issues.tmp"
+    if staging_dir.exists():
+        shutil.rmtree(staging_dir)
+    staging_dir.mkdir(parents=True)
+
+    new_numbers: set[Any] = set()
+    written = 0
+    skipped = 0
+    try:
+        for issue in issues:
+            number = issue.get("number")
+            if number is None:
+                skipped += 1
+                continue
+            new_numbers.add(number)
+            write_json_file(staging_dir / f"issue_{number}.json", issue)
+            written += 1
+
+        # Primero se escriben los nuevos y recién después se borran los
+        # obsoletos, para no perder datos si algo falla a mitad de camino.
+        for path in staging_dir.iterdir():
+            os.replace(path, repo_dir / path.name)
+
+        if cleanup:
+            for path in repo_dir.glob("issue_*.json"):
+                stem = path.stem[len("issue_") :]
+                key: Any = int(stem) if stem.isdigit() else stem
+                if key not in new_numbers:
+                    path.unlink()
+    finally:
+        shutil.rmtree(staging_dir, ignore_errors=True)
+
+    if skipped and verbose:
+        print(f"    aviso: {skipped} issues sin número no se guardaron como JSON")
+
+    return written
+
+
+def full_raw_page_set(directory: Path, files: list[Path]) -> bool:
+    """Indica si `files` cubre todas las páginas crudas del repositorio."""
+    raw_dir = directory / RAW_DIR_NAME
+    if not raw_dir.is_dir():
+        return False
+
+    processed = {file.resolve() for file in files}
+    return all(file.resolve() in processed for file in raw_dir.glob("page_*.json"))
 
 
 def load_metadata(directory: Path) -> dict[str, Any]:
@@ -346,12 +470,14 @@ def command_filter(args: argparse.Namespace) -> int:
     output_path = Path(args.out)
 
     try:
-        json_files, csv_files = input_files(input_path, output_path, args.source)
+        raw_files, json_files, csv_files = input_files(
+            input_path, output_path, args.source
+        )
     except (FileNotFoundError, ValueError) as exc:
         print(f"Error: {exc}", file=sys.stderr)
         return 2
 
-    if not json_files and not csv_files:
+    if not raw_files and not json_files and not csv_files:
         print(
             f"No hay archivos para leer en {display_path(input_path)} "
             f"(--source {args.source}).",
@@ -368,18 +494,82 @@ def command_filter(args: argparse.Namespace) -> int:
     fields_order: list[str] = []
     matches_rows: list[dict[str, str]] = []
     seen_links: dict[str, int] = {}
+    metadata_cache: dict[Path, dict[str, Any]] = {}
     scanned = 0
     read_errors = 0
+    json_written = 0
     warned_missing = False
+    regenerated: set[Path] = set()
 
-    # Los JSON individuales traen el cuerpo y las etiquetas completas, así que
-    # se procesan primero y sirven para enriquecer cualquier CSV duplicado.
-    if json_files:
+    # Las páginas crudas son la fuente principal: primero se separan los
+    # issues en JSON individuales y después se filtran.
+    if raw_files:
         groups: dict[Path, list[Path]] = {}
-        for file in json_files:
+        for file in raw_files:
             groups.setdefault(repository_directory(file), []).append(file)
 
-        metadata_cache: dict[Path, dict[str, Any]] = {}
+        for directory, files in sorted(
+            groups.items(), key=lambda item: display_path(item[0])
+        ):
+            issues, errors = issues_from_raw_pages(files)
+            read_errors += errors
+
+            cleanup = full_raw_page_set(directory, files) and errors == 0
+            written = 0
+            try:
+                written = write_individual_issues(
+                    directory,
+                    issues,
+                    cleanup=cleanup,
+                    verbose=verbose,
+                )
+                json_written += written
+                if cleanup:
+                    regenerated.add(directory.resolve())
+            except OSError as exc:
+                print(
+                    f"  aviso: no se pudieron escribir los JSON de "
+                    f"{display_path(directory)}: {exc}",
+                    file=sys.stderr,
+                )
+                read_errors += 1
+
+            directory_scanned = 0
+            directory_matched = 0
+
+            for issue in issues:
+                row = json_issue_row(issue, directory, metadata_cache)
+                for field in CANONICAL_FIELDS:
+                    add_field(fields_order, field)
+
+                directory_scanned += 1
+                scanned += 1
+
+                matches = match_issue(row, keywords, label_keywords)
+                if matches:
+                    directory_matched += 1
+                    add_match(row, matches, matches_rows, seen_links)
+
+            if verbose:
+                print(
+                    f"{display_path(directory)}: {directory_scanned} issues, "
+                    f"{directory_matched} coincidencias, "
+                    f"{written} JSON individuales"
+                )
+
+    # JSON individuales ya existentes (o generados en una ejecución anterior).
+    # Se omiten los que se acaban de regenerar desde `raw/` y los que hayan
+    # quedado obsoletos, para no releer datos duplicados ni inexistentes.
+    json_files = [
+        file
+        for file in json_files
+        if file.is_file()
+        and repository_directory(file).resolve() not in regenerated
+    ]
+    if json_files:
+        groups = {}
+        for file in json_files:
+            groups.setdefault(repository_directory(file), []).append(file)
 
         for directory, files in sorted(
             groups.items(), key=lambda item: display_path(item[0])
@@ -391,7 +581,10 @@ def command_filter(args: argparse.Namespace) -> int:
                 try:
                     issues = load_json_issues(file)
                 except (OSError, json.JSONDecodeError) as exc:
-                    print(f"  aviso: no se pudo leer {display_path(file)}: {exc}", file=sys.stderr)
+                    print(
+                        f"  aviso: no se pudo leer {display_path(file)}: {exc}",
+                        file=sys.stderr,
+                    )
                     read_errors += 1
                     continue
 
@@ -432,9 +625,7 @@ def command_filter(args: argparse.Namespace) -> int:
                 ):
                     print(
                         "Aviso: hay CSV sin columnas descripcion/etiquetas; "
-                        "se buscará solo en el título. Usá los JSON de "
-                        "issues/ o regenerá los CSV con "
-                        "repo_fetch_issues.py --with-details.",
+                        "se buscará solo en el título.",
                         file=sys.stderr,
                     )
                     warned_missing = True
@@ -464,6 +655,8 @@ def command_filter(args: argparse.Namespace) -> int:
 
     if verbose:
         print()
+        print(f"Páginas crudas leídas: {len(raw_files)}")
+        print(f"JSON individuales escritos: {json_written}")
         print(f"Archivos JSON leídos: {len(json_files)}")
         print(f"Archivos CSV leídos: {len(csv_files)}")
         print(f"Issues revisados: {scanned}")
@@ -479,9 +672,9 @@ def command_filter(args: argparse.Namespace) -> int:
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(
         description=(
-            "Filtra issues relacionados con GitHub Agentic Workflows usando "
-            "los JSON individuales (y opcionalmente los CSV) generados por "
-            "repo_fetch_issues.py, sin consultar la API."
+            "Separa los issues de las páginas crudas en JSON individuales y "
+            "filtra los relacionados con GitHub Agentic Workflows, sin "
+            "consultar la API."
         )
     )
     parser.add_argument(
@@ -502,11 +695,11 @@ def build_parser() -> argparse.ArgumentParser:
     )
     parser.add_argument(
         "--source",
-        choices=("auto", "json", "csv"),
+        choices=("auto", "raw", "json", "csv"),
         default="auto",
         help=(
-            "Fuente de datos: auto (JSON + CSV, priorizando JSON), json "
-            "(solo issue_*.json) o csv (solo CSV históricos)"
+            "Fuente de datos: auto (raw + JSON + CSV, en ese orden), raw "
+            "(solo page_*.json), json (solo issue_*.json) o csv (solo CSV)"
         ),
     )
     parser.add_argument(

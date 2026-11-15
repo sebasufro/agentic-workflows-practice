@@ -1,42 +1,36 @@
 #!/usr/bin/env python3
 """
-repo_fetch_issues.py — Descarga issues en crudo y los guarda por repositorio.
+repo_fetch_issues.py — Descarga los issues en bruto, página por página.
 
 Para cada repositorio se crea una carpeta dentro de `issues/` con el nombre
-`{dueño}__{repo}`. Dentro de esa carpeta se guarda:
+`{dueño}__{repo}`. El script guarda únicamente la respuesta cruda de cada página
+de la API:
 
-    raw/page_0001.json      Respuesta cruda de cada página de la API
-    raw/page_0002.json      (se conservan issues y pull requests tal cual)
-    issue_123.json          Un JSON por issue real (sin pull requests)
-    issue_124.json
-    {repo}_issues.csv       Lista de issues con el esquema de siempre
-    metadata.json           Fechas, cantidades y estado de la descarga
+    issues/
+    └── {dueño}__{repo}/
+        └── raw/
+            ├── page_0001.json
+            └── page_0002.json
 
-Las páginas crudas se descargan siguiendo los headers `Link` de GitHub. En
-repositorios con muchísimos issues GitHub usa paginación por cursor
-(`after`/`before`) y rechaza `page` a partir de la página 100; el script detecta
-ese caso y continúa solo con el cursor.
+Los archivos conservan issues y pull requests tal como los devuelve GitHub. El
+parseo de cada página, la creación de los `issue_{número}.json` individuales y
+el filtrado quedan a cargo de `repo_filter_issues.py`.
 
-Los pull requests se conservan en los archivos crudos, pero se descartan al
-generar los JSON individuales y el CSV. El CSV mantiene el esquema:
+Las páginas se descargan siguiendo los headers `Link` de GitHub. En repositorios
+con muchísimos issues GitHub usa paginación por cursor (`after`/`before`) y
+rechaza `page` a partir de la página 100; el script detecta ese caso y continúa
+solo con el cursor.
 
-    nombre_repositorio,dueño_repositorio,titulo,salida,link_issue
-
-Con `--with-details` se agregan `descripcion` y `etiquetas` después de `titulo`.
-
-La carpeta de un repositorio se actualiza de forma segura: si la descarga falla
-a mitad de camino se conservan los datos anteriores; si termina bien, se
-eliminan las páginas y los JSON de issues que ya no existen.
-
-`--parse-only` regenera los JSON individuales, el CSV y los metadatos a partir
-de las páginas crudas ya guardadas, sin llamar a la API.
+La carpeta `raw/` se actualiza de forma segura: si la descarga falla a mitad de
+camino se conservan las páginas anteriores; si termina bien, se reemplazan por
+las nuevas.
 
 Ejemplos:
 
-    # Un repositorio -> issues/{dueño}__{repo}/
+    # Un repositorio -> issues/{dueño}__{repo}/raw/
     python scripts/repo_fetch_issues.py --repo PowerShell/vscode-powershell
 
-    # Todos los repositorios de repos.json -> una carpeta por repositorio
+    # Todos los repositorios de repos.json
     python scripts/repo_fetch_issues.py --repos-file repos.json
 
     # Los primeros 10 de repos.json
@@ -46,20 +40,9 @@ Ejemplos:
     python scripts/repo_fetch_issues.py --repos-file repos.json \\
         --sample 10 --seed 42
 
-    # Incluir también descripción y etiquetas en el CSV
-    python scripts/repo_fetch_issues.py --repo PowerShell/vscode-powershell \\
-        --with-details
-
-    # Regenerar JSON individuales y CSV desde las páginas crudas guardadas
-    python scripts/repo_fetch_issues.py --parse-only
-
-    # Regenerar solo un repositorio
-    python scripts/repo_fetch_issues.py --parse-only \\
-        --repo PowerShell/vscode-powershell
-
-    # Además de las carpetas, escribir un CSV combinado
-    python scripts/repo_fetch_issues.py --repos-file repos.json --limit 10 \\
-        --combined --out issues-10.csv
+    # Cambiar la carpeta base de salida
+    python scripts/repo_fetch_issues.py \\
+        --repo PowerShell/vscode-powershell --issues-dir /tmp/issues
 
     # Ver la selección y las rutas de salida sin llamar a la API
     python scripts/repo_fetch_issues.py --repos-file repos.json --org PowerShell \\
@@ -69,7 +52,6 @@ Ejemplos:
 from __future__ import annotations
 
 import argparse
-import csv
 import json
 import os
 import random
@@ -77,7 +59,6 @@ import re
 import shutil
 import sys
 import urllib.parse
-from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
 
@@ -88,26 +69,9 @@ from repo_search_agentic import (
     load_and_report_token,
 )
 
-CSV_FIELDS = (
-    "nombre_repositorio",
-    "dueño_repositorio",
-    "titulo",
-    "salida",
-    "link_issue",
-)
-DETAILED_CSV_FIELDS = (
-    "nombre_repositorio",
-    "dueño_repositorio",
-    "titulo",
-    "descripcion",
-    "etiquetas",
-    "salida",
-    "link_issue",
-)
 PROJECT_ROOT = Path(__file__).resolve().parent.parent
 ISSUES_DIR = PROJECT_ROOT / "issues"
 RAW_DIR_NAME = "raw"
-METADATA_NAME = "metadata.json"
 
 
 # --------------------------------------------------------------------------- #
@@ -200,37 +164,6 @@ def resolve_repositories(args: argparse.Namespace) -> list[str]:
     return list(dict.fromkeys(repo for repo in repos if repo))
 
 
-def repository_from_folder(directory: Path) -> str:
-    """Reconstruye owner/repo desde metadata.json o desde el nombre de carpeta."""
-    metadata = load_metadata(directory / METADATA_NAME)
-    repository = metadata.get("repository") if metadata else None
-    if isinstance(repository, str) and "/" in repository:
-        return normalize_repository(repository)
-
-    name = directory.name
-    if "__" in name:
-        owner, repo = name.split("__", 1)
-        if owner and repo:
-            return f"{owner}/{repo}"
-    return name
-
-
-def discover_local_repositories(issues_dir: Path) -> list[str]:
-    """Lista las carpetas de issues/ que ya tienen páginas crudas."""
-    if not issues_dir.is_dir():
-        raise FileNotFoundError(f"No existe el directorio de issues: {issues_dir}")
-
-    repositories: list[str] = []
-    for directory in sorted(path for path in issues_dir.iterdir() if path.is_dir()):
-        if not (directory / RAW_DIR_NAME).is_dir():
-            continue
-        repository = repository_from_folder(directory)
-        if repository:
-            repositories.append(repository)
-
-    return list(dict.fromkeys(repositories))
-
-
 # --------------------------------------------------------------------------- #
 # Paginación
 # --------------------------------------------------------------------------- #
@@ -304,59 +237,8 @@ def write_json_file(path: Path, data: Any) -> None:
     os.replace(temp_path, path)
 
 
-def write_csv_file(path: Path, fields: tuple[str, ...], rows: list[list[str]]) -> None:
-    path.parent.mkdir(parents=True, exist_ok=True)
-    temp_path = path.with_name(path.name + ".tmp")
-    with temp_path.open("w", encoding="utf-8", newline="") as handle:
-        writer = csv.writer(handle)
-        writer.writerow(fields)
-        writer.writerows(rows)
-    os.replace(temp_path, path)
-
-
-def load_metadata(path: Path) -> dict[str, Any]:
-    if not path.is_file():
-        return {}
-    try:
-        data = json.loads(path.read_text(encoding="utf-8"))
-    except (OSError, json.JSONDecodeError):
-        return {}
-    return data if isinstance(data, dict) else {}
-
-
-def utc_timestamp() -> str:
-    return datetime.now(timezone.utc).isoformat(timespec="seconds")
-
-
-def csv_fields(with_details: bool) -> tuple[str, ...]:
-    return DETAILED_CSV_FIELDS if with_details else CSV_FIELDS
-
-
-def issue_labels(issue: dict[str, Any]) -> str:
-    names: list[str] = []
-    for label in issue.get("labels") or []:
-        name = label.get("name") if isinstance(label, dict) else str(label)
-        if name:
-            names.append(str(name))
-    return ";".join(names)
-
-
-def issue_row(repo: str, issue: dict[str, Any], with_details: bool) -> list[str]:
-    owner, name = split_repository(repo)
-    number = issue.get("number")
-    link = issue.get("html_url") or (
-        f"https://github.com/{repo}/issues/{number}" if number is not None else ""
-    )
-
-    row: list[str] = [name, owner, issue.get("title") or ""]
-    if with_details:
-        row.extend([issue.get("body") or "", issue_labels(issue)])
-    row.extend([issue.get("state") or "", link])
-    return row
-
-
 # --------------------------------------------------------------------------- #
-# Descarga y parseo
+# Descarga
 # --------------------------------------------------------------------------- #
 
 
@@ -417,172 +299,15 @@ def fetch_raw_pages(
     return pages_saved, raw_items, pull_requests, complete
 
 
-def read_raw_pages(raw_dir: Path) -> list[list[Any]]:
-    """Lee las páginas crudas en orden y valida que sean listas."""
-    pages: list[list[Any]] = []
-    for path in sorted(raw_dir.glob("page_*.json")):
-        data = json.loads(path.read_text(encoding="utf-8"))
-        if isinstance(data, list):
-            pages.append(data)
-    return pages
-
-
-def parse_raw_issues(pages: list[list[Any]]) -> list[dict[str, Any]]:
-    """Extrae los issues reales de las páginas y descarta pull requests."""
-    by_number: dict[Any, dict[str, Any]] = {}
-    order: list[Any] = []
-
-    for page in pages:
-        for item in page:
-            if not isinstance(item, dict) or "pull_request" in item:
-                continue
-            number = item.get("number")
-            key: Any = number if number is not None else f"sin-numero-{len(order)}"
-            if key not in by_number:
-                order.append(key)
-            by_number[key] = item
-
-    return [by_number[key] for key in order]
-
-
-def write_individual_issues(
-    repo_dir: Path,
-    issues: list[dict[str, Any]],
-    verbose: bool,
-) -> None:
-    """Escribe issue_{numero}.json y elimina los que ya no existen."""
-    staging_dir = repo_dir / ".issues.tmp"
-    if staging_dir.exists():
-        shutil.rmtree(staging_dir)
-    staging_dir.mkdir(parents=True)
-
-    new_numbers: set[Any] = set()
-    skipped = 0
-    try:
-        for issue in issues:
-            number = issue.get("number")
-            if number is None:
-                skipped += 1
-                continue
-            new_numbers.add(number)
-            write_json_file(staging_dir / f"issue_{number}.json", issue)
-
-        for path in repo_dir.glob("issue_*.json"):
-            stem = path.stem[len("issue_") :]
-            key: Any = int(stem) if stem.isdigit() else stem
-            if key not in new_numbers:
-                path.unlink()
-
-        for path in staging_dir.iterdir():
-            os.replace(path, repo_dir / path.name)
-    finally:
-        shutil.rmtree(staging_dir, ignore_errors=True)
-
-    if skipped and verbose:
-        print(f"    aviso: {skipped} issues sin número no se guardaron como JSON")
-
-
-def write_metadata(
-    repo_dir: Path,
-    repo: str,
-    *,
-    base: dict[str, Any] | None = None,
-    fetched_at: str | None = None,
-    pages: int,
-    raw_items: int,
-    issue_count: int,
-    pull_requests: int,
-    complete: bool,
-    fields: tuple[str, ...],
-    max_pages: int,
-) -> None:
-    owner, name = split_repository(repo)
-    metadata: dict[str, Any] = dict(base or {})
-    metadata.update(
-        {
-            "repository": repo,
-            "owner": owner,
-            "name": name,
-            "pages": pages,
-            "raw_items": raw_items,
-            "issues": issue_count,
-            "pull_requests": pull_requests,
-            "complete": complete,
-            "csv": f"{name}_issues.csv",
-            "csv_fields": list(fields),
-            "max_pages": max_pages,
-            "parsed_at": utc_timestamp(),
-        }
-    )
-    metadata["fetched_at"] = fetched_at or metadata.get("fetched_at") or utc_timestamp()
-    write_json_file(repo_dir / METADATA_NAME, metadata)
-
-
-def parse_repository(
-    repo: str,
-    issues_dir: Path,
-    *,
-    with_details: bool,
-    verbose: bool,
-) -> tuple[list[dict[str, Any]], list[list[str]], int, int, int]:
-    """Regenera JSON individuales, CSV y metadata desde las páginas crudas."""
-    _, name = split_repository(repo)
-    repo_dir = repository_directory(issues_dir, repo)
-    raw_dir = repo_dir / RAW_DIR_NAME
-    if not raw_dir.is_dir():
-        raise FileNotFoundError(
-            f"No hay páginas crudas para {repo} en {display_output_path(raw_dir)}/"
-        )
-
-    pages = read_raw_pages(raw_dir)
-    issues = parse_raw_issues(pages)
-    raw_items = sum(len(page) for page in pages)
-    pull_requests = sum(
-        1
-        for page in pages
-        for item in page
-        if isinstance(item, dict) and "pull_request" in item
-    )
-
-    write_individual_issues(repo_dir, issues, verbose)
-    rows = [issue_row(repo, issue, with_details) for issue in issues]
-    write_csv_file(repo_dir / f"{name}_issues.csv", csv_fields(with_details), rows)
-
-    metadata = load_metadata(repo_dir / METADATA_NAME)
-    write_metadata(
-        repo_dir,
-        repo,
-        base=metadata,
-        pages=len(pages),
-        raw_items=raw_items,
-        issue_count=len(issues),
-        pull_requests=pull_requests,
-        complete=bool(metadata.get("complete", True)),
-        fields=csv_fields(with_details),
-        max_pages=int(metadata.get("max_pages") or 0),
-    )
-
-    if verbose:
-        print(
-            f"    {len(pages)} páginas, {len(issues)} issues, "
-            f"{pull_requests} PRs descartados"
-        )
-        print(f"    JSON y CSV regenerados en {display_output_path(repo_dir)}/")
-
-    return issues, rows, len(pages), raw_items, pull_requests
-
-
 def fetch_repository(
     api: GitHubAPI,
     repo: str,
     issues_dir: Path,
     *,
     max_pages: int,
-    with_details: bool,
     verbose: bool,
-) -> tuple[list[dict[str, Any]], list[list[str]], int, int, int]:
-    """Descarga un repositorio y actualiza su carpeta de forma segura."""
-    _, name = split_repository(repo)
+) -> tuple[int, int, int, bool]:
+    """Descarga un repositorio y actualiza únicamente su carpeta raw/."""
     repo_dir = repository_directory(issues_dir, repo)
     repo_dir.mkdir(parents=True, exist_ok=True)
 
@@ -591,7 +316,6 @@ def fetch_repository(
         shutil.rmtree(staging_dir)
     staging_dir.mkdir(parents=True)
 
-    fetched_at = utc_timestamp()
     try:
         pages, raw_items, pull_requests, complete = fetch_raw_pages(
             api, repo, staging_dir, max_pages, verbose
@@ -618,35 +342,16 @@ def fetch_repository(
         if old_dir.exists():
             shutil.rmtree(old_dir, ignore_errors=True)
 
-    raw_pages = read_raw_pages(raw_dir)
-    issues = parse_raw_issues(raw_pages)
-    write_individual_issues(repo_dir, issues, verbose)
-    rows = [issue_row(repo, issue, with_details) for issue in issues]
-    write_csv_file(repo_dir / f"{name}_issues.csv", csv_fields(with_details), rows)
-
-    write_metadata(
-        repo_dir,
-        repo,
-        fetched_at=fetched_at,
-        pages=pages,
-        raw_items=raw_items,
-        issue_count=len(issues),
-        pull_requests=pull_requests,
-        complete=complete,
-        fields=csv_fields(with_details),
-        max_pages=max_pages,
-    )
-
     if verbose:
         print(
-            f"    {pages} páginas, {len(issues)} issues, "
-            f"{pull_requests} PRs descartados"
+            f"    {pages} páginas, {raw_items} elementos crudos, "
+            f"{pull_requests} PRs"
         )
-        print(f"    CSV: {display_output_path(repo_dir / f'{name}_issues.csv')}")
+        print(f"    Crudo: {display_output_path(raw_dir)}/")
         if not complete:
             print("    aviso: descarga parcial por --max-pages")
 
-    return issues, rows, pages, raw_items, pull_requests
+    return pages, raw_items, pull_requests, complete
 
 
 # --------------------------------------------------------------------------- #
@@ -666,34 +371,19 @@ def command_fetch_issues(args: argparse.Namespace) -> int:
         return 2
 
     issues_dir = Path(args.issues_dir)
-    parse_only = bool(args.parse_only)
 
     try:
-        if parse_only and not args.repo and not args.repos_file:
-            repositories = discover_local_repositories(issues_dir)
-        else:
-            repositories = resolve_repositories(args)
+        repositories = resolve_repositories(args)
     except FileNotFoundError:
-        source = (
-            args.issues_dir
-            if parse_only
-            else (args.repos_file or "repos.json")
-        )
-        print(f"Error: no existe el archivo o directorio {source}", file=sys.stderr)
+        source = args.repos_file or "repos.json"
+        print(f"Error: no existe el archivo {source}", file=sys.stderr)
         return 2
     except (json.JSONDecodeError, ValueError) as exc:
         print(f"Error: {exc}", file=sys.stderr)
         return 2
 
     if not repositories:
-        if parse_only:
-            print(
-                f"No hay carpetas con {RAW_DIR_NAME}/ en "
-                f"{display_output_path(issues_dir)}/.",
-                file=sys.stderr,
-            )
-        else:
-            print("La lista de repositorios está vacía.", file=sys.stderr)
+        print("La lista de repositorios está vacía.", file=sys.stderr)
         return 2
 
     available = {repo.lower() for repo in repositories}
@@ -722,10 +412,9 @@ def command_fetch_issues(args: argparse.Namespace) -> int:
 
     verbose = not args.quiet
     if verbose:
-        mode = "parseando crudos locales" if parse_only else "descargando de la API"
         print(
             f"Repositorios: {len(repositories)} disponibles; "
-            f"{len(selected)} seleccionados ({mode})."
+            f"{len(selected)} seleccionados."
         )
 
     if not selected:
@@ -744,71 +433,37 @@ def command_fetch_issues(args: argparse.Namespace) -> int:
         return 2
 
     if args.dry_run:
-        if args.split:
-            print(
-                "Aviso: --split ya no es necesario; la salida siempre es una "
-                "carpeta por repositorio.",
-                file=sys.stderr,
-            )
         for repo in selected:
             repo_dir = repository_dirs[repo]
-            _, name = split_repository(repo)
-            print(f"{repo} -> {display_output_path(repo_dir)}/")
-            print(
-                f"  crudo:  {display_output_path(repo_dir / RAW_DIR_NAME)}/"
-                "page_NNNN.json"
-            )
-            print(f"  issues: {display_output_path(repo_dir)}/issue_N.json")
-            print(f"  csv:    {display_output_path(repo_dir / f'{name}_issues.csv')}")
-        if args.combined:
-            print(f"combinado: {display_output_path(Path(args.out))}")
+            print(f"{repo} -> {display_output_path(repo_dir / RAW_DIR_NAME)}/")
         return 0
 
-    if args.split:
+    api = build_api(args)
+    if not api.authenticated:
         print(
-            "Aviso: --split ya no es necesario; la salida siempre es una "
-            "carpeta por repositorio.",
+            "Aviso: sin GITHUB_TOKEN el límite es 60 peticiones/hora; "
+            "puede no alcanzar para todos los repositorios.",
             file=sys.stderr,
         )
 
-    api: GitHubAPI | None = None
-    if not parse_only:
-        api = build_api(args)
-        if not api.authenticated:
-            print(
-                "Aviso: sin GITHUB_TOKEN el límite es 60 peticiones/hora; "
-                "puede no alcanzar para todos los repositorios.",
-                file=sys.stderr,
-            )
-
-    total_issues = 0
     total_pages = 0
+    total_items = 0
+    total_prs = 0
     processed = 0
     errors: list[tuple[str, str]] = []
-    combined_rows: list[list[str]] = []
 
     for position, repo in enumerate(selected, 1):
         if verbose:
             print(f"[{position}/{len(selected)}] {repo}")
 
         try:
-            if parse_only:
-                issues, rows, pages, _, _ = parse_repository(
-                    repo,
-                    issues_dir,
-                    with_details=args.with_details,
-                    verbose=verbose,
-                )
-            else:
-                assert api is not None
-                issues, rows, pages, _, _ = fetch_repository(
-                    api,
-                    repo,
-                    issues_dir,
-                    max_pages=args.max_pages,
-                    with_details=args.with_details,
-                    verbose=verbose,
-                )
+            pages, raw_items, pull_requests, _ = fetch_repository(
+                api,
+                repo,
+                issues_dir,
+                max_pages=args.max_pages,
+                verbose=verbose,
+            )
         except AuthenticationError:
             raise
         except Exception as exc:  # seguimos con el resto de repositorios
@@ -816,32 +471,17 @@ def command_fetch_issues(args: argparse.Namespace) -> int:
             errors.append((repo, str(exc)))
             continue
 
-        total_issues += len(issues)
         total_pages += pages
-        combined_rows.extend(rows)
+        total_items += raw_items
+        total_prs += pull_requests
         processed += 1
-
-    if args.combined:
-        if processed or not errors:
-            combined_output = Path(args.out)
-            write_csv_file(
-                combined_output, csv_fields(args.with_details), combined_rows
-            )
-            if verbose:
-                print(f"CSV combinado: {display_output_path(combined_output)}")
-        elif verbose:
-            print(
-                "Aviso: no se escribió el CSV combinado porque ningún "
-                "repositorio terminó correctamente.",
-                file=sys.stderr,
-            )
 
     if verbose:
         print()
         print(f"Repositorios procesados: {processed}")
         print(f"Páginas crudas: {total_pages}")
-        print(f"Issues exportados: {total_issues}")
-        print(f"Salida: {display_output_path(issues_dir)}/ (una carpeta por repositorio)")
+        print(f"Elementos descargados: {total_items} ({total_prs} PRs)")
+        print(f"Salida: {display_output_path(issues_dir)}/{{dueño}}__{{repo}}/raw/")
 
     if errors:
         print(f"Repositorios con error: {len(errors)}", file=sys.stderr)
@@ -855,8 +495,8 @@ def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(
         description=(
             "Descarga los issues de uno o varios repositorios en bruto, por "
-            "páginas, y genera JSON individuales y CSV por repositorio dentro "
-            "de issues/."
+            "páginas, y los guarda en issues/{dueño}__{repo}/raw/. El parseo y "
+            "el filtrado los hace repo_filter_issues.py."
         )
     )
     parser.add_argument(
@@ -919,49 +559,9 @@ def build_parser() -> argparse.ArgumentParser:
         help="Carpeta base de salida (por defecto: issues/)",
     )
     parser.add_argument(
-        "--parse-only",
-        action="store_true",
-        help=(
-            "No llama a la API: regenera los JSON individuales, el CSV y los "
-            "metadatos desde las páginas crudas guardadas"
-        ),
-    )
-    parser.add_argument(
         "--dry-run",
         action="store_true",
         help="Mostrar la selección y las rutas de salida sin llamar a la API",
-    )
-    parser.add_argument(
-        "--split",
-        action="store_true",
-        help=(
-            "Obsoleto: se conserva por compatibilidad. La salida ya es siempre "
-            "una carpeta por repositorio"
-        ),
-    )
-    parser.add_argument(
-        "--combined",
-        action="store_true",
-        help=(
-            "Además de las carpetas por repositorio, escribir un CSV combinado "
-            "en --out"
-        ),
-    )
-    parser.add_argument(
-        "--out",
-        default="issues.csv",
-        help=(
-            "Archivo CSV combinado cuando se usa --combined "
-            "(por defecto: issues.csv)"
-        ),
-    )
-    parser.add_argument(
-        "--with-details",
-        action="store_true",
-        help=(
-            "Agregar descripcion y etiquetas al CSV (útil para "
-            "repo_filter_issues.py)"
-        ),
     )
     parser.add_argument(
         "--max-pages",
@@ -986,7 +586,7 @@ def main() -> int:
     parser = build_parser()
     args = parser.parse_args()
 
-    if not args.parse_only and not args.dry_run:
+    if not args.dry_run:
         try:
             load_and_report_token(args)
         except FileNotFoundError as exc:
