@@ -15,6 +15,9 @@ Ejemplos:
     # Descubre y guarda en repos.json (opciones por defecto)
     python scripts/repo_search_agentic.py
 
+    # Supera el tope de 1.000 resultados repartiendo por tamaño e incluye forks
+    python scripts/repo_search_agentic.py --all-results --include-forks
+
     # Solo repositorios con 100 o más páginas de issues (10.000 issues)
     python scripts/repo_search_agentic.py --issues-pages 100
 
@@ -36,6 +39,7 @@ import time
 import urllib.error
 import urllib.parse
 import urllib.request
+from dataclasses import dataclass
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
@@ -371,52 +375,309 @@ def load_and_report_token(args: argparse.Namespace) -> Path | None:
 # --------------------------------------------------------------------------- #
 
 
+SEARCH_PER_PAGE = 100
+SEARCH_MAX_PAGES = 10
+
+# La Code Search API solo deja recuperar 10 páginas (1.000 coincidencias) por
+# consulta. Para superar ese tope se parte la búsqueda por tamaño de archivo en
+# bytes (`size:`) y se subdivide cada grupo que siga superando el límite. Los
+# rangos iniciales son solo una pista: la partición se adapta recursivamente.
+SIZE_BUCKETS = (
+    (0, 1_000),
+    (1_001, 5_000),
+    (5_001, 10_000),
+    (10_001, 20_000),
+    (20_001, 50_000),
+    (50_001, 100_000),
+    (100_001, 150_000),
+    (150_001, 200_000),
+    (200_001, 300_000),
+    (300_001, 500_000),
+    (500_001, 1_000_000),
+    (1_000_001, 100_000_000),
+    (100_000_001, 2_000_000_000),
+)
+
+
+@dataclass
+class Discovery:
+    repositories: dict[str, list[str]]
+    total_count: int
+    truncated: bool
+    queries: list[str]
+    per_query: list[dict[str, Any]]
+    requests: int = 0
+
+
+class CodeSearch:
+    """Cliente de Code Search con pausa entre peticiones y contador."""
+
+    def __init__(self, api: GitHubAPI, pause: float = 6.2, verbose: bool = True) -> None:
+        self.api = api
+        self.pause = max(0.0, pause)
+        self.verbose = verbose
+        self.requests = 0
+        self._last_request: float | None = None
+
+    def _throttle(self) -> None:
+        if self._last_request is None:
+            return
+        wait = self.pause - (time.monotonic() - self._last_request)
+        if wait > 0:
+            time.sleep(wait)
+
+    def request(self, query: str, page: int = 1, per_page: int = SEARCH_PER_PAGE) -> dict[str, Any]:
+        self._throttle()
+        try:
+            data, _ = self.api.get_json(
+                "/search/code",
+                {"q": query, "per_page": per_page, "page": page},
+            )
+            return data or {}
+        finally:
+            self._last_request = time.monotonic()
+            self.requests += 1
+
+    def count(self, query: str) -> int:
+        return int(self.request(query, page=1, per_page=1).get("total_count") or 0)
+
+    def collect(
+        self,
+        query: str,
+        max_pages: int = SEARCH_MAX_PAGES,
+    ) -> tuple[list[dict[str, Any]], int]:
+        """Recupera hasta `max_pages` páginas de una consulta."""
+        items: list[dict[str, Any]] = []
+        total = 0
+
+        for page in range(1, max_pages + 1):
+            data = self.request(query, page=page)
+            total = max(total, int(data.get("total_count") or 0))
+            batch = data.get("items") or []
+            items.extend(batch)
+
+            if self.verbose:
+                print(f"    página {page}: {len(batch)} archivos")
+            if len(batch) < SEARCH_PER_PAGE:
+                break
+
+        return items, max(total, len(items))
+
+
+def collect_exhaustive(
+    search: CodeSearch,
+    query: str,
+    max_pages: int = SEARCH_MAX_PAGES,
+    initial_ranges: tuple[tuple[int, int], ...] = SIZE_BUCKETS,
+) -> tuple[list[dict[str, Any]], int, bool]:
+    """Recupera todos los resultados posibles repartiendo la consulta por tamaño.
+
+    Cada grupo (`size:lo..hi`) se subdivide a la mitad mientras su `total_count`
+    supere `max_pages * 100`. Devuelve las coincidencias, el total reportado y
+    si algún grupo quedó incompleto (por ejemplo, todos los archivos del mismo
+    tamaño).
+    """
+    cap = max_pages * SEARCH_PER_PAGE
+
+    # Primero se prueba la consulta completa: si entra en el tope, no hace
+    # falta repartirla. `total_count` es aproximado, así que si se llenó el
+    # tope de páginas igual se subdivide para no perder resultados.
+    base_total = search.count(query)
+    if base_total == 0:
+        return [], 0, False
+    if base_total <= cap:
+        batch, observed = search.collect(query, max_pages=max_pages)
+        if len(batch) < cap:
+            return batch, max(base_total, observed), False
+        if search.verbose:
+            print(
+                f"    se llenó el tope de {cap} resultados; "
+                "se reparte por tamaño para verificar.",
+                file=sys.stderr,
+            )
+
+    items: list[dict[str, Any]] = []
+    reported_total = 0
+    truncated = False
+
+    stack: list[tuple[int, int]] = list(reversed(initial_ranges))
+    while stack:
+        lo, hi = stack.pop()
+        bucket_query = f"{query} size:{lo}..{hi}"
+        total = search.count(bucket_query)
+
+        if total == 0:
+            continue
+
+        if total <= cap:
+            if search.verbose:
+                print(f"    size:{lo}..{hi}: {total} resultados")
+            batch, observed = search.collect(bucket_query, max_pages=max_pages)
+
+            # `total_count` es aproximado: si se llenó el tope de páginas,
+            # puede haber más resultados. Se subdivide para no perderlos.
+            if len(batch) >= cap and lo < hi:
+                if search.verbose:
+                    print(
+                        f"    size:{lo}..{hi}: se llenó el tope de "
+                        f"{cap}; se subdivide para verificar.",
+                        file=sys.stderr,
+                    )
+                mid = lo + (hi - lo) // 2
+                stack.append((mid + 1, hi))
+                stack.append((lo, mid))
+                continue
+
+            if len(batch) >= cap:
+                truncated = True
+            reported_total += max(total, observed)
+            items.extend(batch)
+            continue
+
+        if lo >= hi:
+            if search.verbose:
+                print(
+                    f"    size:{lo}..{hi}: {total} resultados "
+                    f"(no se puede dividir más; se guardan {cap})",
+                    file=sys.stderr,
+                )
+            batch, observed = search.collect(bucket_query, max_pages=max_pages)
+            reported_total += max(total, observed)
+            items.extend(batch)
+            truncated = True
+            continue
+
+        mid = lo + (hi - lo) // 2
+        stack.append((mid + 1, hi))
+        stack.append((lo, mid))
+
+    return items, reported_total, truncated
+
+
+def prepare_query(query: str, include_forks: bool) -> str:
+    if include_forks and "fork:" not in query:
+        return f"{query} fork:true"
+    return query
+
+
 def discover_repositories(
     api: GitHubAPI,
     queries: list[str],
-    max_pages: int = 10,
+    max_pages: int = SEARCH_MAX_PAGES,
     pause: float = 6.2,
-) -> tuple[dict[str, list[str]], int, bool]:
-    """Busca los marcadores de gh-aw y devuelve {repo: [archivos encontrados]}."""
+    *,
+    exhaustive: bool = False,
+    include_forks: bool = False,
+    verbose: bool = True,
+) -> Discovery:
+    """Busca los marcadores de gh-aw y devuelve los repositorios encontrados."""
+    search = CodeSearch(api, pause=pause, verbose=verbose)
     found: dict[str, set[str]] = {}
     total_count = 0
+    truncated = False
+    per_query: list[dict[str, Any]] = []
+    effective_queries: list[str] = []
 
-    for query_index, query in enumerate(queries):
+    for raw_query in queries:
+        query = prepare_query(raw_query, include_forks)
+        effective_queries.append(query)
         print(f"  consulta: {query}")
-        for page in range(1, max_pages + 1):
-            data, _ = api.get_json(
-                "/search/code",
-                {"q": query, "per_page": 100, "page": page},
+
+        if exhaustive and "size:" not in query:
+            items, reported, cut = collect_exhaustive(
+                search, query, max_pages=max_pages
             )
-            if data is None:
-                break
+        else:
+            if exhaustive:
+                print(
+                    "    aviso: la consulta ya incluye size:; "
+                    "no se puede repartir automáticamente.",
+                    file=sys.stderr,
+                )
+            items, reported = search.collect(query, max_pages=max_pages)
+            cut = reported > max_pages * SEARCH_PER_PAGE
 
-            total_count = max(total_count, int(data.get("total_count") or 0))
-            items = data.get("items") or []
-            for item in items:
-                repo = (item.get("repository") or {}).get("full_name")
-                path = item.get("path")
-                if repo and path:
-                    found.setdefault(repo, set()).add(path)
+        total_count += reported
+        truncated = truncated or cut
+        per_query.append(
+            {"query": query, "total_count": reported, "truncated": cut}
+        )
 
-            print(f"    página {page}: {len(items)} archivos")
-            if len(items) < 100:
-                break
-            if page < max_pages:
-                time.sleep(pause)
+        for item in items:
+            repo = (item.get("repository") or {}).get("full_name")
+            path = item.get("path")
+            if repo and path:
+                found.setdefault(repo, set()).add(path)
 
-        if query_index < len(queries) - 1:
-            time.sleep(pause)
+    repositories = {
+        repo: sorted(paths) for repo, paths in sorted(found.items())
+    }
+    return Discovery(
+        repositories=repositories,
+        total_count=total_count,
+        truncated=truncated,
+        queries=effective_queries,
+        per_query=per_query,
+        requests=search.requests,
+    )
 
-    repos = {repo: sorted(paths) for repo, paths in sorted(found.items())}
-    truncated = total_count > max_pages * 100
-    return repos, total_count, truncated
+
+def load_existing_repositories(path: Path) -> dict[str, list[str]]:
+    """Lee repositorios de un JSON previo (formato del script o lista simple)."""
+    if not path.exists():
+        return {}
+
+    try:
+        data = json.loads(path.read_text(encoding="utf-8"))
+    except (OSError, json.JSONDecodeError) as exc:
+        print(
+            f"Aviso: no se pudo leer {path} para --merge: {exc}",
+            file=sys.stderr,
+        )
+        return {}
+
+    repositories = data.get("repositories", data) if isinstance(data, dict) else data
+    loaded: dict[str, list[str]] = {}
+
+    if isinstance(repositories, dict):
+        for repo, paths in repositories.items():
+            if isinstance(paths, list):
+                loaded[str(repo)] = [str(path) for path in paths]
+            else:
+                loaded[str(repo)] = []
+    elif isinstance(repositories, list):
+        for item in repositories:
+            if isinstance(item, str):
+                loaded[item] = []
+
+    return loaded
+
+
+def merge_repositories(
+    current: dict[str, list[str]],
+    previous: dict[str, list[str]],
+) -> dict[str, list[str]]:
+    merged = {repo: set(paths) for repo, paths in current.items()}
+    for repo, paths in previous.items():
+        merged.setdefault(repo, set()).update(paths)
+    return {repo: sorted(paths) for repo, paths in sorted(merged.items())}
+
+
+def write_json_atomic(path: Path, payload: Any) -> None:
+    """Escribe el JSON sin dejar el archivo a medias si se interrumpe."""
+    path.parent.mkdir(parents=True, exist_ok=True)
+    temporary = path.with_name(path.name + ".tmp")
+    temporary.write_text(
+        json.dumps(payload, indent=2, ensure_ascii=False) + "\n",
+        encoding="utf-8",
+    )
+    os.replace(temporary, path)
 
 
 def discover_with_sourcegraph(
     query: str,
     max_results: int = 1000,
-) -> tuple[dict[str, list[str]], int, bool]:
+) -> Discovery:
     """Alternativa sin token: busca en el índice público de Sourcegraph.
 
     Sourcegraph no indexa todo GitHub, pero permite superar el tope de 1.000
@@ -472,7 +733,20 @@ def discover_with_sourcegraph(
     flush()
 
     repos = {repo: sorted(paths) for repo, paths in sorted(found.items())}
-    return repos, total, total >= max_results
+    return Discovery(
+        repositories=repos,
+        total_count=total,
+        truncated=total >= max_results,
+        queries=[query],
+        per_query=[
+            {
+                "query": query,
+                "total_count": total,
+                "truncated": total >= max_results,
+            }
+        ],
+        requests=1,
+    )
 
 
 ISSUES_PER_PAGE = 100
@@ -581,13 +855,17 @@ def command_discover(args: argparse.Namespace) -> int:
     if args.issues_pages < 0:
         print("Error: --issues-pages debe ser >= 0.", file=sys.stderr)
         return 2
-    if args.max_pages < 0:
-        print("Error: --max-pages debe ser >= 0.", file=sys.stderr)
+    if args.max_pages < 1:
+        print("Error: --max-pages debe ser >= 1.", file=sys.stderr)
         return 2
     if args.max_results < 1:
         print("Error: --max-results debe ser >= 1.", file=sys.stderr)
         return 2
+    if args.pause < 0:
+        print("Error: --pause debe ser >= 0.", file=sys.stderr)
+        return 2
 
+    output = Path(args.out)
     api = build_api(args)
 
     if args.issues_pages > 0 and not api.authenticated:
@@ -599,13 +877,19 @@ def command_discover(args: argparse.Namespace) -> int:
         )
         return 2
 
+    if args.all_results and args.source == "sourcegraph":
+        print(
+            "Aviso: --all-results solo aplica a la Code Search API; "
+            "se ignora con --source sourcegraph.",
+            file=sys.stderr,
+        )
+
     if args.source == "sourcegraph":
         print("Buscando repositorios en el índice público de Sourcegraph...")
-        repos, total_count, truncated = discover_with_sourcegraph(
+        discovery = discover_with_sourcegraph(
             query=args.query[0],
             max_results=args.max_results,
         )
-        queries = [args.query[0]]
     else:
         if not api.authenticated:
             print(
@@ -616,21 +900,60 @@ def command_discover(args: argparse.Namespace) -> int:
             return 2
 
         print("Buscando repositorios con workflows de gh-aw...")
-        repos, total_count, truncated = discover_repositories(
+        if args.all_results:
+            print(
+                "  modo exhaustivo: se reparte la búsqueda por tamaño de "
+                "archivo para superar el tope de 1.000 resultados.\n"
+                "  puede tardar varios minutos y consumir rate limit."
+            )
+        if args.include_forks:
+            print("  se incluyen forks (fork:true).")
+
+        discovery = discover_repositories(
             api,
             queries=args.query,
             max_pages=args.max_pages,
+            pause=args.pause,
+            exhaustive=args.all_results,
+            include_forks=args.include_forks,
+            verbose=not args.quiet,
         )
-        queries = args.query
 
-    payload = {
+    repos = discovery.repositories
+    merged = False
+
+    if args.merge:
+        previous = load_existing_repositories(output)
+        if previous:
+            before = len(repos)
+            repos = merge_repositories(repos, previous)
+            merged = True
+            print(
+                f"  fusionado con {output}: {before} -> {len(repos)} "
+                "repositorios (sin duplicados)."
+            )
+        else:
+            print(
+                f"  aviso: --merge no encontró repositorios en {output}; "
+                "se guarda solo la búsqueda actual.",
+                file=sys.stderr,
+            )
+
+    payload: dict[str, Any] = {
         "generated_at": utc_now(),
         "source": args.source,
-        "queries": queries,
-        "total_count": total_count,
-        "truncated": truncated,
+        "queries": discovery.queries,
+        "total_count": discovery.total_count,
+        "truncated": discovery.truncated,
         "repositories": repos,
     }
+    if args.source == "github":
+        payload["exhaustive"] = bool(args.all_results)
+        payload["include_forks"] = bool(args.include_forks)
+        payload["search_requests"] = discovery.requests
+        payload["query_stats"] = discovery.per_query
+    if merged:
+        payload["merged"] = True
 
     found_count = len(repos)
     issue_pages: dict[str, int] = {}
@@ -663,9 +986,7 @@ def command_discover(args: argparse.Namespace) -> int:
                 file=sys.stderr,
             )
 
-    output = Path(args.out)
-    output.parent.mkdir(parents=True, exist_ok=True)
-    output.write_text(json.dumps(payload, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
+    write_json_atomic(output, payload)
 
     print()
     print(f"Repositorios encontrados: {len(repos)}")
@@ -677,14 +998,33 @@ def command_discover(args: argparse.Namespace) -> int:
         removed = found_count - len(repos)
         if removed:
             print(f"Descartados por pocos issues: {removed}")
-    print(f"Resultados reportados por la fuente: {total_count}")
-    if truncated:
-        print(
-            "⚠️ Se alcanzó el tope de resultados de la búsqueda; "
-            "la lista puede estar incompleta. Divide la búsqueda por org/user "
-            "o complementa con otra fuente (Sourcegraph/BigQuery).",
-            file=sys.stderr,
-        )
+    print(f"Resultados reportados por la fuente: {discovery.total_count}")
+    if args.source == "github" and not args.quiet:
+        print(f"Peticiones de búsqueda realizadas: {discovery.requests}")
+
+    if discovery.truncated:
+        if args.source == "sourcegraph":
+            print(
+                "⚠️ Sourcegraph devolvió el máximo solicitado; la lista puede "
+                "estar incompleta. Aumentá --max-results o usá "
+                "--source github --all-results.",
+                file=sys.stderr,
+            )
+        elif args.all_results:
+            print(
+                "⚠️ Quedaron grupos de archivos que superan el tope incluso "
+                "después de repartirlos por tamaño (probablemente muchos "
+                "archivos del mismo tamaño). La lista puede estar incompleta.",
+                file=sys.stderr,
+            )
+        else:
+            print(
+                "⚠️ Se alcanzó el tope de resultados de la búsqueda; "
+                "la lista puede estar incompleta. Probá --all-results para "
+                "repartirla por tamaño y --include-forks para sumar forks.",
+                file=sys.stderr,
+            )
+
     print(f"Guardado en: {output}")
     print()
     print("Siguiente paso:")
@@ -731,7 +1071,10 @@ def build_parser() -> argparse.ArgumentParser:
         type=int,
         default=10,
         metavar="N",
-        help="Máximo de páginas de resultados de búsqueda (100 cada una)",
+        help=(
+            "Máximo de páginas (100 resultados cada una) por consulta. En "
+            "modo --all-results define el tamaño máximo de cada grupo"
+        ),
     )
     parser.add_argument(
         "--max-results",
@@ -739,6 +1082,41 @@ def build_parser() -> argparse.ArgumentParser:
         default=1000,
         metavar="N",
         help="Máximo de coincidencias en Sourcegraph",
+    )
+    parser.add_argument(
+        "--all-results",
+        action="store_true",
+        help=(
+            "Recuperar todos los resultados posibles repartiendo la consulta "
+            "por tamaño de archivo (size:). Supera el tope de 1.000 de la "
+            "Code Search API, pero puede tardar varios minutos"
+        ),
+    )
+    parser.add_argument(
+        "--include-forks",
+        action="store_true",
+        help=(
+            "Incluir forks (agrega fork:true a la consulta). La búsqueda de "
+            "código los excluye por defecto"
+        ),
+    )
+    parser.add_argument(
+        "--merge",
+        action="store_true",
+        help=(
+            "Fusionar los repositorios encontrados con los del archivo --out "
+            "si ya existe, sin duplicados"
+        ),
+    )
+    parser.add_argument(
+        "--pause",
+        type=float,
+        default=6.2,
+        metavar="SEGUNDOS",
+        help=(
+            "Pausa entre peticiones de búsqueda para respetar el rate limit "
+            "(por defecto: 6.2)"
+        ),
     )
     parser.add_argument(
         "--issues-pages",

@@ -3,8 +3,11 @@
 Herramientas para estudiar el uso de GitHub Agentic Workflows (`gh-aw`):
 
 - [`scripts/repo_search_agentic.py`](scripts/repo_search_agentic.py): descubre
-  repositorios que usan `gh-aw` y genera `repos.json`. Con `--issues-pages N`
-  conserva solo los que tienen N o más páginas de issues.
+  repositorios que usan `gh-aw` y genera `repos.json`. Con `--all-results`
+  reparte la búsqueda por tamaño de archivo para superar el tope de 1.000
+  resultados de Code Search; `--include-forks` suma forks y `--merge`
+  acumula con un JSON anterior. Con `--issues-pages N` conserva solo los que
+  tienen N o más páginas de issues.
 - [`scripts/repo_scan_actions.py`](scripts/repo_scan_actions.py): empareja
   `.md` ↔ `.lock.yml` y genera reportes Markdown de ejecuciones.
   Ver [instrucciones](scripts/README.md).
@@ -26,6 +29,8 @@ Herramientas para estudiar el uso de GitHub Agentic Workflows (`gh-aw`):
 # Opción A: crear .env en la raíz con GITHUB_TOKEN=ghp_...
 # Opción B: export GITHUB_TOKEN=ghp_...
 python scripts/repo_search_agentic.py
+# Superar el tope de 1.000 resultados y sumar forks
+python scripts/repo_search_agentic.py --all-results --include-forks
 # Alternativa: solo repositorios con 100+ páginas de issues
 python scripts/repo_search_agentic.py --issues-pages 100
 python scripts/repo_scan_actions.py repo PowerShell/vscode-powershell --runs 100
