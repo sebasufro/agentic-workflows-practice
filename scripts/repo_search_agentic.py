@@ -12,8 +12,17 @@ carga de `.env`, cliente REST de GitHub y manejo básico de errores.
 
 Ejemplos:
 
-    python scripts/repo_search_agentic.py discover --out repos.json
-    python scripts/repo_search_agentic.py discover --source sourcegraph --out repos.json
+    # Descubre y guarda en repos.json (opciones por defecto)
+    python scripts/repo_search_agentic.py
+
+    # Solo repositorios con 100 o más páginas de issues (10.000 issues)
+    python scripts/repo_search_agentic.py --issues-pages 100
+
+    # Explorar el índice público de Sourcegraph
+    python scripts/repo_search_agentic.py --source sourcegraph
+
+    # Guardar en otro archivo
+    python scripts/repo_search_agentic.py --out /tmp/repos-grandes.json
 """
 
 from __future__ import annotations
@@ -206,9 +215,18 @@ class GitHubAPI:
         url: str,
         accept: str = "application/vnd.github+json",
         retries: int = 4,
+        data: bytes | None = None,
+        method: str | None = None,
     ) -> tuple[bytes | None, Any]:
-        """GET con reintentos. Devuelve (body, headers) o (None, headers) en 404."""
-        request = urllib.request.Request(url, headers=self._headers(accept))
+        """GET o POST con reintentos. Devuelve (body, headers) o (None, headers) en 404."""
+        request = urllib.request.Request(
+            url,
+            data=data,
+            headers=self._headers(accept),
+            method=method,
+        )
+        if data is not None:
+            request.add_header("Content-Type", "application/json")
 
         for attempt in range(retries + 1):
             try:
@@ -281,6 +299,20 @@ class GitHubAPI:
         if body is None:
             return None
         return body.decode("utf-8", "replace")
+
+    def graphql(self, query: str) -> dict[str, Any]:
+        """Ejecuta una consulta GraphQL y devuelve el payload completo."""
+        body, _ = self.open(
+            API_ROOT + "/graphql",
+            data=json.dumps({"query": query}).encode("utf-8"),
+            method="POST",
+        )
+        if body is None:
+            raise RuntimeError("GitHub GraphQL devolvió 404.")
+        payload = json.loads(body.decode("utf-8"))
+        if not isinstance(payload, dict):
+            raise RuntimeError("Respuesta inesperada de GitHub GraphQL.")
+        return payload
 
 
 # --------------------------------------------------------------------------- #
@@ -442,8 +474,130 @@ def discover_with_sourcegraph(
     repos = {repo: sorted(paths) for repo, paths in sorted(found.items())}
     return repos, total, total >= max_results
 
+
+ISSUES_PER_PAGE = 100
+ISSUE_COUNT_CHUNK = 50
+
+
+def issue_page_count(total_issues: int) -> int:
+    """Convierte una cantidad de issues en páginas de 100."""
+    return (total_issues + ISSUES_PER_PAGE - 1) // ISSUES_PER_PAGE
+
+
+def issue_page_counts(
+    api: GitHubAPI,
+    repositories: list[str],
+    *,
+    chunk_size: int = ISSUE_COUNT_CHUNK,
+    verbose: bool = True,
+) -> dict[str, int | None]:
+    """Cuenta los issues abiertos y cerrados de cada repositorio vía GraphQL.
+
+    Devuelve {repo: total_issues}. Un valor None indica que no se pudo obtener
+    el dato (repositorio borrado, sin permisos o error puntual). Los pull
+    requests no se cuentan.
+    """
+    counts: dict[str, int | None] = {}
+    total = len(repositories)
+
+    for start in range(0, total, chunk_size):
+        chunk = repositories[start : start + chunk_size]
+        parts: list[str] = []
+        aliases: dict[str, str] = {}
+
+        for index, repo in enumerate(chunk):
+            owner, separator, name = repo.partition("/")
+            if not separator or not owner or not name:
+                counts[repo] = None
+                continue
+            alias = f"r{index}"
+            aliases[alias] = repo
+            parts.append(
+                f"{alias}: repository(owner: {json.dumps(owner)}, "
+                f"name: {json.dumps(name)}) {{ hasIssuesEnabled "
+                "issues(states: [OPEN, CLOSED]) { totalCount } }"
+            )
+
+        if not parts:
+            continue
+
+        payload = api.graphql("query {\n  " + "\n  ".join(parts) + "\n}")
+        data = payload.get("data") or {}
+        errors = payload.get("errors") or []
+
+        for error in errors:
+            if not isinstance(error, dict):
+                continue
+            path = error.get("path") or []
+            if not path:
+                message = error.get("message") or "error desconocido"
+                raise RuntimeError(f"GitHub GraphQL: {message}")
+
+        for alias, repo in aliases.items():
+            node = data.get(alias)
+            if not isinstance(node, dict):
+                counts[repo] = None
+                continue
+            if not node.get("hasIssuesEnabled"):
+                counts[repo] = 0
+                continue
+            issues = node.get("issues") or {}
+            value = issues.get("totalCount")
+            counts[repo] = int(value) if isinstance(value, int) else None
+
+        if verbose:
+            done = min(start + chunk_size, total)
+            print(f"    issues: {done}/{total} repositorios")
+
+    return counts
+
+
+def filter_by_issue_pages(
+    repositories: dict[str, list[str]],
+    counts: dict[str, int | None],
+    min_pages: int,
+) -> tuple[dict[str, list[str]], list[str]]:
+    """Deja solo los repos con al menos `min_pages` páginas de issues.
+
+    Si no se pudo contar un repositorio, se conserva y se informa aparte para
+    no descartarlo por un error temporal.
+    """
+    kept: dict[str, list[str]] = {}
+    unknown: list[str] = []
+
+    for repo, paths in repositories.items():
+        total_issues = counts.get(repo)
+        if total_issues is None:
+            kept[repo] = paths
+            unknown.append(repo)
+            continue
+        if issue_page_count(total_issues) >= min_pages:
+            kept[repo] = paths
+
+    return kept, unknown
+
+
 def command_discover(args: argparse.Namespace) -> int:
+    if args.issues_pages < 0:
+        print("Error: --issues-pages debe ser >= 0.", file=sys.stderr)
+        return 2
+    if args.max_pages < 0:
+        print("Error: --max-pages debe ser >= 0.", file=sys.stderr)
+        return 2
+    if args.max_results < 1:
+        print("Error: --max-results debe ser >= 1.", file=sys.stderr)
+        return 2
+
     api = build_api(args)
+
+    if args.issues_pages > 0 and not api.authenticated:
+        print(
+            "Error: --issues-pages necesita un token para contar los issues "
+            "de cada repositorio. Configurá GITHUB_TOKEN en .env, usá --token "
+            "o quitá --issues-pages.",
+            file=sys.stderr,
+        )
+        return 2
 
     if args.source == "sourcegraph":
         print("Buscando repositorios en el índice público de Sourcegraph...")
@@ -478,12 +632,51 @@ def command_discover(args: argparse.Namespace) -> int:
         "repositories": repos,
     }
 
+    found_count = len(repos)
+    issue_pages: dict[str, int] = {}
+    unknown_repos: list[str] = []
+
+    if args.issues_pages > 0 and repos:
+        print()
+        print(
+            f"Contando issues para exigir al menos {args.issues_pages} "
+            f"páginas de {ISSUES_PER_PAGE}..."
+        )
+        counts = issue_page_counts(api, list(repos), verbose=not args.quiet)
+        repos, unknown_repos = filter_by_issue_pages(
+            repos, counts, args.issues_pages
+        )
+        issue_pages = {
+            repo: issue_page_count(counts[repo])
+            for repo in repos
+            if counts.get(repo) is not None
+        }
+        payload["repositories"] = repos
+        payload["min_issue_pages"] = args.issues_pages
+        payload["issue_pages"] = issue_pages
+        payload["repos_before_filter"] = found_count
+
+        if unknown_repos:
+            print(
+                f"Aviso: no se pudo contar {len(unknown_repos)} repositorios; "
+                "se conservan para no descartarlos por un error temporal.",
+                file=sys.stderr,
+            )
+
     output = Path(args.out)
     output.parent.mkdir(parents=True, exist_ok=True)
     output.write_text(json.dumps(payload, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
 
     print()
     print(f"Repositorios encontrados: {len(repos)}")
+    if args.issues_pages > 0:
+        print(
+            f"Filtro aplicado: >= {args.issues_pages} páginas de issues "
+            f"(~{args.issues_pages * ISSUES_PER_PAGE} issues)"
+        )
+        removed = found_count - len(repos)
+        if removed:
+            print(f"Descartados por pocos issues: {removed}")
     print(f"Resultados reportados por la fuente: {total_count}")
     if truncated:
         print(
@@ -507,7 +700,8 @@ def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(
         description=(
             "Descubre repositorios que usan GitHub Agentic Workflows y guarda "
-            "la lista para repo_scan_actions.py."
+            "la lista para repo_scan_actions.py. Sin argumentos busca en la "
+            "Code Search API y guarda repos.json."
         )
     )
     parser.add_argument(
@@ -519,36 +713,50 @@ def build_parser() -> argparse.ArgumentParser:
         "--env-file",
         help="Archivo .env desde el que leer GITHUB_TOKEN (por defecto: ./.env)",
     )
-    parser.add_argument("--quiet", action="store_true", help="Oculta mensajes de progreso")
-
-    subparsers = parser.add_subparsers(dest="command", required=True)
-
-    discover = subparsers.add_parser(
-        "discover",
-        help="Busca repositorios con el marcador gh-aw-metadata (Code Search API)",
-    )
-    discover.add_argument(
+    parser.add_argument(
         "--source",
         choices=("github", "sourcegraph"),
         default="github",
         help="Fuente del descubrimiento (github usa Code Search API)",
     )
-    discover.add_argument(
+    parser.add_argument(
         "--query",
         action="append",
         default=None,
+        metavar="TEXTO",
         help=f"Consulta de búsqueda (repetible). Por defecto: {DEFAULT_QUERY!r}",
     )
-    discover.add_argument("--max-pages", type=int, default=10, help="Máximo de páginas (100 c/u)")
-    discover.add_argument(
+    parser.add_argument(
+        "--max-pages",
+        type=int,
+        default=10,
+        metavar="N",
+        help="Máximo de páginas de resultados de búsqueda (100 cada una)",
+    )
+    parser.add_argument(
         "--max-results",
         type=int,
         default=1000,
+        metavar="N",
         help="Máximo de coincidencias en Sourcegraph",
     )
-    discover.add_argument("--out", default="repos.json", help="Archivo JSON de salida")
-    discover.set_defaults(func=command_discover)
-
+    parser.add_argument(
+        "--issues-pages",
+        type=int,
+        default=0,
+        metavar="N",
+        help=(
+            "Conservar solo repositorios con N o más páginas de issues "
+            "(100 issues por página, abiertos y cerrados). 0 = sin filtro"
+        ),
+    )
+    parser.add_argument(
+        "--out",
+        default="repos.json",
+        metavar="ARCHIVO",
+        help="Archivo JSON de salida (por defecto: repos.json)",
+    )
+    parser.add_argument("--quiet", action="store_true", help="Oculta mensajes de progreso")
     return parser
 
 
@@ -562,11 +770,11 @@ def main() -> int:
         print(f"Error: {exc}", file=sys.stderr)
         return 2
 
-    if args.command == "discover" and not args.query:
+    if not args.query:
         args.query = [DEFAULT_QUERY]
 
     try:
-        return int(args.func(args))
+        return int(command_discover(args))
     except AuthenticationError as exc:
         print(f"Error de autenticación: {exc}", file=sys.stderr)
         print(
